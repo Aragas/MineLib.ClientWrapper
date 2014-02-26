@@ -1,0 +1,71 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProjectGuid>{CE1D9FC2-2CBF-432F-9BA6-69D79CF870EA}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <AssemblyName>ConsoleApplication</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>MineLib.ClientWrapper</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LICENSE" />
+    <None Include="Note" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BigData\Entity.cs" />
+    <Compile Include="BigData\Object.cs" />
+    <Compile Include="BigData\ThisPlayer.cs" />
+    <Compile Include="BigData\Vehile.cs" />
+    <Compile Include="BigData\World.cs" />
+    <Compile Include="Data\Anvil\Block.cs" />
+    <Compile Include="Data\Anvil\Chunk.cs" />
+    <Compile Include="Data\Anvil\Decompressor.cs" />
+    <Compile Include="Data\Anvil\Section.cs" />
+    <Compile Include="Minecraft.Client.cs" />
+    <Compile Include="Minecraft.cs" />
+    <Compile Include="Minecraft.Events.cs" />
+    <Compile Include="Minecraft.PacketsHandler.cs" />
+    <Compile Include="TestClient.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Network\MineLib.Network.csproj">
+      <Project>{e7c8320e-49a4-4187-afe3-15c814201e1e}</Project>
+      <Name>MineLib.Network</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
+  <ProjectExtensions>
+    <VisualStudio AllowExistingFolder="true" />
+  </ProjectExtensions>
+</Project>
