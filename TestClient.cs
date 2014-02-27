@@ -5,18 +5,20 @@ using MineLib.ClientWrapper.BigData;
 using MineLib.Network.Enums;
 using MineLib.Network.Packets;
 using MineLib.Network.Packets.Client;
+using MineLib.Network.Packets.Client.Login;
 using MineLib.Network.Packets.Server;
+using MineLib.Network.Packets.Server.Login;
 
 namespace MineLib.ClientWrapper
 {
-    static class TestClient
+    public static class TestClient
     {
-        static World World;
+        public static World World;
         static Minecraft Client;
         static List<IPacket> list = new List<IPacket>();
         static NetworkStream nStream;
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Client = new Minecraft("TestBot", "", false);
 
@@ -49,7 +51,7 @@ namespace MineLib.ClientWrapper
             {
                 World = Client.World;
             }
-            Console.Read();
+            //Console.Read();
         }
 
         private static void Client_PacketHandled(object sender, IPacket packet, int id, ServerState state)

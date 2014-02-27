@@ -38,10 +38,6 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="LICENSE" />
-    <None Include="Note" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="BigData\Entity.cs" />
     <Compile Include="BigData\Object.cs" />
     <Compile Include="BigData\ThisPlayer.cs" />

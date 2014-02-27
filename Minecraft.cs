@@ -4,7 +4,7 @@ using MineLib.ClientWrapper.BigData;
 using MineLib.Network;
 using MineLib.Network.Enums;
 using MineLib.Network.Packets;
-using MineLib.Network.Packets.Server;
+using ChatMessagePacket = MineLib.Network.Packets.Client.ChatMessagePacket;
 
 namespace MineLib.ClientWrapper
 {
@@ -13,17 +13,40 @@ namespace MineLib.ClientWrapper
     /// </summary>
     public partial class Minecraft : IMinecraft, IDisposable
     {
-        public string ServerIP { get; set; }
+        #region Variables
+        private string _serverIp;
+        public string ServerIP { get { return _serverIp; } set { _serverIp = value; } }
 
-        public string ClientName, ClientPassword, AccessToken, ClientToken, SelectedProfile, ClientBrand;
+        private int _serverPort;
+        public int ServerPort { get { return _serverPort; } set { _serverPort = value; } }
 
-        public int ServerPort { get; set; }
+        private ServerState _serverState;
+        public ServerState State { get { return _serverState; } set { _serverState = value; } }
 
-        public ServerState State { get; set; }
+        private string _clientName;
+        public string ClientName { get { return _clientName; } set { _clientName = value; } }
 
-        public bool VerifyNames;
+        public string ClientPassword { get; set; }
 
-        public bool Running { get; set; }
+        private string _accessToken;
+        public string AccessToken { get { return _accessToken; } set { _accessToken = value; } }
+
+        private string _clientToken;
+        public string ClientToken { get { return _clientToken; } set { _clientToken = value; } }
+
+        private string _selectedProfile;
+        public string SelectedProfile { get { return _selectedProfile; } set { _selectedProfile = value; } }
+
+        private string _clientBrand;
+        public string ClientBrand { get { return _clientBrand; } set { _clientBrand = value; } }
+
+        private bool _verifyName;
+        public bool VerifyNames { get { return _verifyName; } set { _verifyName = value; } }
+
+        private bool _running;
+        public bool Running { get { return _running; } set { _running = value; } }
+
+        #endregion Variables
 
         public NetworkHandler nh;
 
@@ -32,10 +55,6 @@ namespace MineLib.ClientWrapper
         //public Player ThisPlayer; // -- Holds all user information, location, inventory and so on.
         public Dictionary<string, short> PlayerList;
         public Dictionary<int, Entity> Entities;
-        private string _serverIp;
-        private int _serverPort;
-        private bool _running;
-        private ServerState _serverState;
 
         /// <summary>
         /// Create a new Minecraft Instance
@@ -58,8 +77,8 @@ namespace MineLib.ClientWrapper
         {
             if (VerifyNames)
             {
-                YggdrasilStatus result = Yggdrasil.LoginAuthServer(ref ClientName, ClientPassword, ref AccessToken,
-                    ref ClientToken, ref SelectedProfile);
+                YggdrasilStatus result = Yggdrasil.LoginAuthServer(ref _clientName, ClientPassword, ref _accessToken,
+                    ref _clientToken, ref _selectedProfile);
 
                 switch (result)
                 {
@@ -88,7 +107,7 @@ namespace MineLib.ClientWrapper
                 return false;
 
 
-            YggdrasilStatus result = Yggdrasil.RefreshSession(ref AccessToken, ref ClientToken);
+            YggdrasilStatus result = Yggdrasil.RefreshSession(ref _accessToken, ref _clientToken);
 
             switch (result)
             {
@@ -114,7 +133,7 @@ namespace MineLib.ClientWrapper
                 return false;
 
 
-            YggdrasilStatus result = Yggdrasil.RefreshSession(ref AccessToken, ref ClientToken);
+            YggdrasilStatus result = Yggdrasil.RefreshSession(ref _accessToken, ref _clientToken);
 
             switch (result)
             {
@@ -165,7 +184,7 @@ namespace MineLib.ClientWrapper
 
         public void SendChatMessage(string message)
         {
-            nh.Send(new ChatMessagePacket {Message = message});
+            nh.Send(new ChatMessagePacket { Message = message });
         }
 
         /// <summary>
