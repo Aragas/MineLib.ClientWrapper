@@ -79,6 +79,7 @@ namespace MineLib.ClientWrapper.Data.Anvil
                     Buffer.BlockCopy(BlocksLight, lightOff, temp3, 0, 2048); // -- Block lighting.
                     Buffer.BlockCopy(SkyLight, skyLightOff, temp4, 0, 2048);
 
+                    // Strange. Some Sections can be null.
                     Section mySection = Sections[current];
 
                     mySection.BlocksType = temp;

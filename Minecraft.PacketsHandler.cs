@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using MineLib.Network;
 using MineLib.Network.Enums;
 using MineLib.Network.Packets;
 

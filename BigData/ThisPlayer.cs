@@ -85,7 +85,7 @@ namespace MineLib.ClientWrapper.BigData
 
     public struct PlayerAbilities
     {
-        public byte Flags;
+        public PlayerAbility Flags;
         public float FlyingSpeed, WalkingSpeed;
     }
 

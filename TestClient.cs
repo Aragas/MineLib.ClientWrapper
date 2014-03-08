@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Sockets;
 using MineLib.ClientWrapper.BigData;
 using MineLib.Network.Enums;
 using MineLib.Network.Packets;
-using MineLib.Network.Packets.Client;
 using MineLib.Network.Packets.Client.Login;
-using MineLib.Network.Packets.Server;
 using MineLib.Network.Packets.Server.Login;
 
 namespace MineLib.ClientWrapper
@@ -24,8 +21,8 @@ namespace MineLib.ClientWrapper
 
             Client.FirePacketHandled += Client_PacketHandled;
 
-            Client.Login();
-            Client.RefreshSession();
+            //Client.Login();
+            //Client.RefreshSession();
             
 
             Client.Connect("127.0.0.1", 25565);
