@@ -1,16 +1,11 @@
 ﻿using System;
+using System.Text;
 using MineLib.ClientWrapper.BigData;
 using MineLib.ClientWrapper.Data.Anvil;
 using MineLib.Network.Data;
 using MineLib.Network.Events;
 using MineLib.Network.Packets;
 using MineLib.Network.Packets.Server;
-//using AnimationPacket = MineLib.Network.Packets.Server.AnimationPacket;
-//using ChatMessagePacket = MineLib.Network.Packets.Server.ChatMessagePacket;
-//using CloseWindowPacket = MineLib.Network.Packets.Server.CloseWindowPacket;
-//using ConfirmTransactionPacket = MineLib.Network.Packets.Server.ConfirmTransactionPacket;
-//using HeldItemChangePacket = MineLib.Network.Packets.Server.HeldItemChangePacket;
-//using PlayerAbilitiesPacket = MineLib.Network.Packets.Server.PlayerAbilitiesPacket;
 
 namespace MineLib.ClientWrapper
 {
@@ -22,7 +17,9 @@ namespace MineLib.ClientWrapper
 
         private void OnKeepAlive(IPacket packet)
         {
-            SendPacket(packet);
+            KeepAlivePacket KeepAlive = (KeepAlivePacket) packet;
+
+            SendPacket(KeepAlive);
         }
 
         private void OnJoinGame(IPacket packet)
@@ -641,6 +638,18 @@ namespace MineLib.ClientWrapper
 
         private void OnPluginMessage(IPacket packet)
         {
+            PluginMessagePacket PluginMessage = (PluginMessagePacket)packet;
+
+            switch (PluginMessage.Channel)
+            {
+                case "MC|Brand":
+                    ServerBrand = Encoding.UTF8.GetString(PluginMessage.Data);
+                    break;
+
+                default:
+                    break;
+            }
+            
 
         }
 

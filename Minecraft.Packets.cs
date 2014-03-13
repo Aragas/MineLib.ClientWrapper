@@ -10,7 +10,7 @@ namespace MineLib.ClientWrapper
 
         List<IPacket> packets = new List<IPacket>();
 
-        void RaisePacketHandled(object sender, IPacket packet, int id, ServerState state)
+        void RaisePacketHandled(IPacket packet, int id, ServerState state)
         {
             packets.Add(packet);
             Ready = true;
@@ -18,6 +18,24 @@ namespace MineLib.ClientWrapper
             switch (state)
             {
                 case ServerState.Login:
+
+                    #region Login
+                    switch ((PacketsServer)id)
+                    {
+                        case PacketsServer.LoginDisconnect:
+                            // Stop.
+                            break;
+
+                        case PacketsServer.EncryptionRequest:
+                            Handler.EnableEncryption(packet);
+                            break;
+
+                        case PacketsServer.LoginSuccess:
+                            State = ServerState.Play;
+                            break;
+                    }
+                    #endregion Login
+
                     break;
 
                 case ServerState.Play:
@@ -290,11 +308,25 @@ namespace MineLib.ClientWrapper
                     break;
 
                 case ServerState.Status:
+
+                    #region Status
+                    switch ((PacketsServer)id)
+                    {
+                        case PacketsServer.Response:
+                            //State = ServerState.Play;
+                            break;
+
+                        case PacketsServer.Ping:
+                            //State = ServerState.Play;
+                            break;
+                    }
+                    #endregion Status
+
                     break;
 
                 default:
                     if (FirePacketHandled != null)
-                        FirePacketHandled(sender, packet, id, state);
+                        FirePacketHandled(packet, id, state);
                     break;
             }
 

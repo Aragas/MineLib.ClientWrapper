@@ -36,6 +36,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BigData\Entity.cs" />
@@ -47,10 +48,13 @@
     <Compile Include="Data\Anvil\Chunk.cs" />
     <Compile Include="Data\Anvil\Decompressor.cs" />
     <Compile Include="Data\Anvil\Section.cs" />
+    <Compile Include="Data\ServerInfo.cs" />
     <Compile Include="Minecraft.Client.cs" />
     <Compile Include="Minecraft.cs" />
     <Compile Include="Minecraft.Events.cs" />
-    <Compile Include="Minecraft.PacketsHandler.cs" />
+    <Compile Include="Minecraft.Packets.cs" />
+    <Compile Include="StatusClient.cs" />
+    <Compile Include="StatusClient.Events.cs" />
     <Compile Include="TestClient.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -59,7 +63,9 @@
       <Name>MineLib.Network</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Compile Include="StatusClient.Packets.cs" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />

@@ -4,7 +4,7 @@ using MineLib.ClientWrapper.BigData;
 using MineLib.Network;
 using MineLib.Network.Enums;
 using MineLib.Network.Packets;
-using ChatMessagePacket = MineLib.Network.Packets.Client.ChatMessagePacket;
+using MineLib.Network.Packets.Client;
 
 namespace MineLib.ClientWrapper
 {
@@ -17,8 +17,8 @@ namespace MineLib.ClientWrapper
         private string _serverIp;
         public string ServerIP { get { return _serverIp; } set { _serverIp = value; } }
 
-        private int _serverPort;
-        public int ServerPort { get { return _serverPort; } set { _serverPort = value; } }
+        private short _serverPort;
+        public short ServerPort { get { return _serverPort; } set { _serverPort = value; } }
 
         private ServerState _serverState;
         public ServerState State { get { return _serverState; } set { _serverState = value; } }
@@ -40,6 +40,9 @@ namespace MineLib.ClientWrapper
         private string _clientBrand;
         public string ClientBrand { get { return _clientBrand; } set { _clientBrand = value; } }
 
+        private string _serverBrand;
+        public string ServerBrand { get { return _serverBrand; } set { _serverBrand = value; } }
+
         private bool _verifyName;
         public bool VerifyNames { get { return _verifyName; } set { _verifyName = value; } }
 
@@ -48,11 +51,10 @@ namespace MineLib.ClientWrapper
 
         #endregion Variables
 
-        public NetworkHandler nh;
+        public NetworkHandler Handler;
 
         public World World; // -- Holds all of the world information. Time, chunks, ect.
-        public ThisPlayer Player;
-        //public Player ThisPlayer; // -- Holds all user information, location, inventory and so on.
+        public ThisPlayer Player; // -- Holds all user information, location, inventory and so on.
         public Dictionary<string, short> PlayerList;
         public Dictionary<int, Entity> Entities;
 
@@ -150,12 +152,12 @@ namespace MineLib.ClientWrapper
         /// </summary>
         /// <param name="ip">The IP of the server to connect to</param>
         /// <param name="port">The port of the server to connect to</param>
-        public void Connect(string ip, int port)
+        public void Connect(string ip, short port)
         {
             ServerIP = ip;
             ServerPort = port;
 
-            if (nh != null)
+            if (Handler != null)
                 Disconnect();
 
             World = new World();
@@ -163,13 +165,13 @@ namespace MineLib.ClientWrapper
             PlayerList = new Dictionary<string, short>();
             Entities = new Dictionary<int, Entity>(); 
 
-            nh = new NetworkHandler(this);
+            Handler = new NetworkHandler(this);
 
             // -- Register our event handlers.
-            nh.OnPacketHandled += RaisePacketHandled;
+            Handler.OnPacketHandled += RaisePacketHandled;
 
             // -- Connect to the server and begin reading packets.
-            nh.Start();
+            Handler.Start();
         }
 
         /// <summary>
@@ -178,13 +180,13 @@ namespace MineLib.ClientWrapper
         /// <param name="packet">IPacket to sent to server</param>
         public void SendPacket(IPacket packet)
         {
-            if (nh != null)
-                nh.Send(packet);
+            if (Handler != null)
+                Handler.Send(packet);
         }
 
         public void SendChatMessage(string message)
         {
-            nh.Send(new ChatMessagePacket { Message = message });
+            Handler.Send(new ChatMessagePacket { Message = message });
         }
 
         /// <summary>
@@ -192,8 +194,8 @@ namespace MineLib.ClientWrapper
         /// </summary>
         public void Disconnect()
         {
-            if (nh != null)
-                nh.Stop();
+            if (Handler != null)
+                Handler.Stop();
 
             // -- Reset all variables to default so we can make a new connection.
 

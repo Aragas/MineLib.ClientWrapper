@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Text;
 using MineLib.ClientWrapper.BigData;
 using MineLib.Network.Enums;
 using MineLib.Network.Packets;
+using MineLib.Network.Packets.Client;
 using MineLib.Network.Packets.Client.Login;
-using MineLib.Network.Packets.Server.Login;
 
 namespace MineLib.ClientWrapper
 {
@@ -19,11 +20,24 @@ namespace MineLib.ClientWrapper
         {
             Client = new Minecraft("TestBot", "", false);
 
-            Client.FirePacketHandled += Client_PacketHandled;
+            using (StatusClient SClient = new StatusClient("127.0.0.1", 25565))
+            {
+                var info = SClient.GetServerInfo(4);
+                //Console.Read();
+            }
 
             //Client.Login();
             //Client.RefreshSession();
-            
+
+            /*
+             Connect()
+             Send new HandshakePacket       (4, localhost, 25565, Login)
+             Send new LoginStartPacket      (Username)
+             Send new PluginMessagePacket   (MC|Brand, ClientBrand)
+             
+             */
+
+            Client.FirePacketHandled += Client_PacketHandled;
 
             Client.Connect("127.0.0.1", 25565);
 
@@ -35,23 +49,24 @@ namespace MineLib.ClientWrapper
                 NextState = NextState.Login,
             });
 
-            Client.SendPacket(new LoginStartPacket { Name = "TestBot" });
+            Client.SendPacket(new LoginStartPacket {Name = "TestBot"});
 
-            //while (!Client.Ready) { }
+            while (Client.State == ServerState.Login) {}
 
-            //Client.SendPacket(new ClientStatusPacket { Status = ClientStatus.InitialSpawn} );
-            //Client.SendPacket(new ClientStatusPacket { Status = ClientStatus.Respawn });
-
-            //Client.SendPacket(new ClientStatusPacket { Status = ClientStatus.InitialSpawn} );
-
-            while (true)
+            Client.SendPacket(new PluginMessagePacket
             {
-                World = Client.World;
-            }
-            //Console.Read();
+                Channel = "MC|Brand",
+                Data = Encoding.UTF8.GetBytes("MineLib.Net")
+            });
+
+            Client.SendPacket(new ClientStatusPacket {Status = ClientStatus.Respawn});
+
+            
+            while (true) {}
+
         }
 
-        private static void Client_PacketHandled(object sender, IPacket packet, int id, ServerState state)
+        private static void Client_PacketHandled(IPacket packet, int id, ServerState state)
         {
             list.Add(packet);
         }
