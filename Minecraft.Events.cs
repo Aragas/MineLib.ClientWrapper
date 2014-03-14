@@ -12,19 +12,19 @@ namespace MineLib.ClientWrapper
     public partial class Minecraft
     {
         public event PacketsHandler FirePacketHandled;
-   
+
         #region Voids
 
         private void OnKeepAlive(IPacket packet)
         {
-            KeepAlivePacket KeepAlive = (KeepAlivePacket) packet;
+            var KeepAlive = (KeepAlivePacket) packet;
 
             SendPacket(KeepAlive);
         }
 
         private void OnJoinGame(IPacket packet)
         {
-            JoinGamePacket JoinGame = (JoinGamePacket) packet;
+            var JoinGame = (JoinGamePacket) packet;
 
             Player.EntityID = JoinGame.EntityID;
 
@@ -37,14 +37,14 @@ namespace MineLib.ClientWrapper
 
         private void OnChatMessage(IPacket packet)
         {
-            ChatMessagePacket ChatMessage = (ChatMessagePacket) packet;
+            var ChatMessage = (ChatMessagePacket) packet;
 
             DisplayChatMessage(ChatMessage.Message);
         }
 
         private void OnTimeUpdate(IPacket packet)
         {
-            TimeUpdatePacket TimeUpdate = (TimeUpdatePacket) packet;
+            var TimeUpdate = (TimeUpdatePacket) packet;
 
             if (Ready)
                 SendPacket(Player.Packet());
@@ -55,7 +55,7 @@ namespace MineLib.ClientWrapper
 
         private void OnEntityEquipment(IPacket packet)
         {
-            EntityEquipmentPacket EntityEquipment = (EntityEquipmentPacket) packet;
+            var EntityEquipment = (EntityEquipmentPacket) packet;
 
             if (!Entities.ContainsKey(EntityEquipment.EntityID))
                 Entities.Add(EntityEquipment.EntityID, new Entity {EntityID = EntityEquipment.EntityID});
@@ -66,7 +66,7 @@ namespace MineLib.ClientWrapper
 
         private void OnSpawnPosition(IPacket packet)
         {
-            SpawnPositionPacket SpawnPosition = (SpawnPositionPacket) packet;
+            var SpawnPosition = (SpawnPositionPacket) packet;
 
             World.SpawnPosition.X = SpawnPosition.X;
             World.SpawnPosition.Y = SpawnPosition.Y;
@@ -75,7 +75,7 @@ namespace MineLib.ClientWrapper
 
         private void OnUpdateHealth(IPacket packet)
         {
-            UpdateHealthPacket UpdateHealth = (UpdateHealthPacket) packet;
+            var UpdateHealth = (UpdateHealthPacket) packet;
 
             Player.Health.Food = UpdateHealth.Food;
             Player.Health.FoodSaturation = UpdateHealth.FoodSaturation;
@@ -84,7 +84,7 @@ namespace MineLib.ClientWrapper
 
         private void OnRespawn(IPacket packet)
         {
-            RespawnPacket Respawn = (RespawnPacket) packet;
+            var Respawn = (RespawnPacket) packet;
 
             World.Dimension = Respawn.Dimension;
             World.Difficulty = Respawn.Difficulty;
@@ -96,13 +96,13 @@ namespace MineLib.ClientWrapper
 
         private void OnPlayerPositionAndLook(IPacket packet)
         {
-            PlayerPositionAndLookPacket PlayerPositionAndLook = (PlayerPositionAndLookPacket) packet;
+            var PlayerPositionAndLook = (PlayerPositionAndLookPacket) packet;
 
             if (!Player.Position.Initialized)
             {
-                Player.Position.Vector3.X = (int)PlayerPositionAndLook.X;
-                Player.Position.Vector3.Y = (int)PlayerPositionAndLook.Y;
-                Player.Position.Vector3.Z = (int)PlayerPositionAndLook.Z;
+                Player.Position.Vector3.X = (int) PlayerPositionAndLook.X;
+                Player.Position.Vector3.Y = (int) PlayerPositionAndLook.Y;
+                Player.Position.Vector3.Z = (int) PlayerPositionAndLook.Z;
                 Player.Look.Yaw = PlayerPositionAndLook.Yaw;
                 Player.Look.Pitch = PlayerPositionAndLook.Pitch;
                 Player.Position.OnGround = PlayerPositionAndLook.OnGround;
@@ -122,17 +122,17 @@ namespace MineLib.ClientWrapper
 
         private void OnHeldItemChange(IPacket packet)
         {
-            HeldItemChangePacket HeldItemChange = (HeldItemChangePacket) packet;
+            var HeldItemChange = (HeldItemChangePacket) packet;
 
             Player.HeldItem.Slot = HeldItemChange.Slot;
         }
 
         private void OnUseBed(IPacket packet)
         {
-            UseBedPacket UseBed = (UseBedPacket) packet;
+            var UseBed = (UseBedPacket) packet;
 
             if (!Entities.ContainsKey(UseBed.EntityID))
-                Entities.Add(UseBed.EntityID, new Entity { EntityID = UseBed.EntityID });
+                Entities.Add(UseBed.EntityID, new Entity {EntityID = UseBed.EntityID});
 
             Entities[UseBed.EntityID].Bed.X = UseBed.X;
             Entities[UseBed.EntityID].Bed.Y = UseBed.Y;
@@ -141,21 +141,20 @@ namespace MineLib.ClientWrapper
 
         private void OnAnimation(IPacket packet)
         {
-            AnimationPacket Animation = (AnimationPacket)packet;
+            var Animation = (AnimationPacket) packet;
 
             if (!Entities.ContainsKey(Animation.EntityID))
-                Entities.Add(Animation.EntityID, new Entity { EntityID = Animation.EntityID });
+                Entities.Add(Animation.EntityID, new Entity {EntityID = Animation.EntityID});
 
             Entities[Animation.EntityID].Animation.Animation = Animation.Animation;
-
         }
 
         private void OnSpawnPlayer(IPacket packet)
         {
-            SpawnPlayerPacket SpawnPlayer = (SpawnPlayerPacket)packet;
+            var SpawnPlayer = (SpawnPlayerPacket) packet;
 
             if (!Entities.ContainsKey(SpawnPlayer.EntityID))
-                Entities.Add(SpawnPlayer.EntityID, new Entity { EntityID = SpawnPlayer.EntityID });
+                Entities.Add(SpawnPlayer.EntityID, new Entity {EntityID = SpawnPlayer.EntityID});
 
             Entities[SpawnPlayer.EntityID].Player.PlayerUUID = SpawnPlayer.PlayerUUID;
             Entities[SpawnPlayer.EntityID].Player.PlayerName = SpawnPlayer.PlayerName;
@@ -169,20 +168,19 @@ namespace MineLib.ClientWrapper
 
         private void OnCollectItem(IPacket packet)
         {
-
         }
 
         private void OnSpawnObject(IPacket packet)
         {
-            SpawnObjectPacket SpawnObject = (SpawnObjectPacket) packet;
+            var SpawnObject = (SpawnObjectPacket) packet;
         }
 
         private void OnSpawnMob(IPacket packet)
         {
-            SpawnMobPacket SpawnMob = (SpawnMobPacket)packet;
+            var SpawnMob = (SpawnMobPacket) packet;
 
             if (!Entities.ContainsKey(SpawnMob.EntityID))
-                Entities.Add(SpawnMob.EntityID, new Entity { EntityID = SpawnMob.EntityID });
+                Entities.Add(SpawnMob.EntityID, new Entity {EntityID = SpawnMob.EntityID});
 
             Entities[SpawnMob.EntityID].Position.X = SpawnMob.X;
             Entities[SpawnMob.EntityID].Position.Y = SpawnMob.Y;
@@ -194,25 +192,22 @@ namespace MineLib.ClientWrapper
             Entities[SpawnMob.EntityID].Velocity.VelocityY = SpawnMob.VelocityY;
             Entities[SpawnMob.EntityID].Velocity.VelocityZ = SpawnMob.VelocityZ;
             Entities[SpawnMob.EntityID].Metadata = SpawnMob.Metadata;
-
         }
 
         private void OnSpawnPainting(IPacket packet)
         {
-
         }
 
         private void OnSpawnExperienceOrb(IPacket packet)
         {
-
         }
 
         private void OnEntityVelocity(IPacket packet)
         {
-            EntityVelocityPacket EntityVelocity = (EntityVelocityPacket) packet;
+            var EntityVelocity = (EntityVelocityPacket) packet;
 
             if (!Entities.ContainsKey(EntityVelocity.EntityID))
-                Entities.Add(EntityVelocity.EntityID, new Entity { EntityID = EntityVelocity.EntityID });
+                Entities.Add(EntityVelocity.EntityID, new Entity {EntityID = EntityVelocity.EntityID});
 
             Entities[EntityVelocity.EntityID].Velocity.VelocityX = EntityVelocity.VelocityX;
             Entities[EntityVelocity.EntityID].Velocity.VelocityY = EntityVelocity.VelocityY;
@@ -221,8 +216,8 @@ namespace MineLib.ClientWrapper
 
         private void OnDestroyEntities(IPacket packet)
         {
-            DestroyEntitiesPacket DestroyEntities = (DestroyEntitiesPacket) packet;
-            foreach (var t in DestroyEntities.EntityIDs)
+            var DestroyEntities = (DestroyEntitiesPacket) packet;
+            foreach (int t in DestroyEntities.EntityIDs)
             {
                 Entities.Remove(t);
             }
@@ -230,17 +225,17 @@ namespace MineLib.ClientWrapper
 
         private void OnEntity(IPacket packet)
         {
-            EntityPacket Entity = (EntityPacket) packet;
+            var Entity = (EntityPacket) packet;
             if (!Entities.ContainsKey(Entity.EntityID))
                 Entities.Add(Entity.EntityID, new Entity {EntityID = Entity.EntityID});
         }
 
         private void OnEntityRelativeMove(IPacket packet)
         {
-            EntityRelativeMovePacket EntityRelativeMove = (EntityRelativeMovePacket) packet;
+            var EntityRelativeMove = (EntityRelativeMovePacket) packet;
 
             if (!Entities.ContainsKey(EntityRelativeMove.EntityID))
-                Entities.Add(EntityRelativeMove.EntityID, new Entity { EntityID = EntityRelativeMove.EntityID });
+                Entities.Add(EntityRelativeMove.EntityID, new Entity {EntityID = EntityRelativeMove.EntityID});
 
             Entities[EntityRelativeMove.EntityID].NewPosition.X = EntityRelativeMove.DeltaX;
             Entities[EntityRelativeMove.EntityID].NewPosition.Y = EntityRelativeMove.DeltaY;
@@ -249,7 +244,7 @@ namespace MineLib.ClientWrapper
 
         private void OnEntityLook(IPacket packet)
         {
-            EntityLookPacket EntityLook = (EntityLookPacket) packet;
+            var EntityLook = (EntityLookPacket) packet;
 
             if (!Entities.ContainsKey(EntityLook.EntityID))
                 Entities.Add(EntityLook.EntityID, new Entity {EntityID = EntityLook.EntityID});
@@ -260,10 +255,11 @@ namespace MineLib.ClientWrapper
 
         private void OnEntityLookAndRelativeMove(IPacket packet)
         {
-            EntityLookAndRelativeMovePacket EntityLookAndRelativeMove = (EntityLookAndRelativeMovePacket) packet;
+            var EntityLookAndRelativeMove = (EntityLookAndRelativeMovePacket) packet;
 
             if (!Entities.ContainsKey(EntityLookAndRelativeMove.EntityID))
-                Entities.Add(EntityLookAndRelativeMove.EntityID, new Entity { EntityID = EntityLookAndRelativeMove.EntityID });
+                Entities.Add(EntityLookAndRelativeMove.EntityID,
+                    new Entity {EntityID = EntityLookAndRelativeMove.EntityID});
 
             Entities[EntityLookAndRelativeMove.EntityID].NewPosition.X = EntityLookAndRelativeMove.DeltaX;
             Entities[EntityLookAndRelativeMove.EntityID].NewPosition.Y = EntityLookAndRelativeMove.DeltaY;
@@ -274,10 +270,10 @@ namespace MineLib.ClientWrapper
 
         private void OnEntityTeleport(IPacket packet)
         {
-            EntityTeleportPacket EntityTeleport = (EntityTeleportPacket) packet;
+            var EntityTeleport = (EntityTeleportPacket) packet;
 
             if (!Entities.ContainsKey(EntityTeleport.EntityID))
-                Entities.Add(EntityTeleport.EntityID, new Entity { EntityID = EntityTeleport.EntityID });
+                Entities.Add(EntityTeleport.EntityID, new Entity {EntityID = EntityTeleport.EntityID});
 
             Entities[EntityTeleport.EntityID].NewPosition.X = EntityTeleport.X;
             Entities[EntityTeleport.EntityID].NewPosition.Y = EntityTeleport.Y;
@@ -288,7 +284,7 @@ namespace MineLib.ClientWrapper
 
         private void OnEntityHeadLook(IPacket packet)
         {
-            EntityHeadLookPacket EntityHeadLook = (EntityHeadLookPacket) packet;
+            var EntityHeadLook = (EntityHeadLookPacket) packet;
 
             if (!Entities.ContainsKey(EntityHeadLook.EntityID))
                 Entities.Add(EntityHeadLook.EntityID, new Entity {EntityID = EntityHeadLook.EntityID});
@@ -298,7 +294,7 @@ namespace MineLib.ClientWrapper
 
         private void OnEntityStatus(IPacket packet)
         {
-            EntityStatusPacket EntityStatus = (EntityStatusPacket) packet;
+            var EntityStatus = (EntityStatusPacket) packet;
 
             if (!Entities.ContainsKey(EntityStatus.EntityID))
                 Entities.Add(EntityStatus.EntityID, new Entity {EntityID = EntityStatus.EntityID});
@@ -308,10 +304,10 @@ namespace MineLib.ClientWrapper
 
         private void OnAttachEntity(IPacket packet)
         {
-            AttachEntityPacket AttachEntity = (AttachEntityPacket)packet;
+            var AttachEntity = (AttachEntityPacket) packet;
 
             if (!Entities.ContainsKey(AttachEntity.EntityID))
-                Entities.Add(AttachEntity.EntityID, new Entity { EntityID = AttachEntity.EntityID });
+                Entities.Add(AttachEntity.EntityID, new Entity {EntityID = AttachEntity.EntityID});
 
             Entities[AttachEntity.EntityID].Vehile.VehileID = AttachEntity.VehicleID;
             Entities[AttachEntity.EntityID].Leash = AttachEntity.Leash;
@@ -319,17 +315,17 @@ namespace MineLib.ClientWrapper
 
         private void OnEntityMetadata(IPacket packet)
         {
-            EntityMetadataPacket EntityMetadata = (EntityMetadataPacket)packet;
+            var EntityMetadata = (EntityMetadataPacket) packet;
 
             if (!Entities.ContainsKey(EntityMetadata.EntityID))
-                Entities.Add(EntityMetadata.EntityID, new Entity { EntityID = EntityMetadata.EntityID });
+                Entities.Add(EntityMetadata.EntityID, new Entity {EntityID = EntityMetadata.EntityID});
 
             Entities[EntityMetadata.EntityID].Metadata = EntityMetadata.Metadata;
         }
 
         private void OnEntityEffect(IPacket packet)
         {
-            EntityEffectPacket EntityEffect = (EntityEffectPacket) packet;
+            var EntityEffect = (EntityEffectPacket) packet;
 
             if (Player.EntityID == EntityEffect.EntityID)
             {
@@ -357,7 +353,7 @@ namespace MineLib.ClientWrapper
 
         private void OnRemoveEntityEffect(IPacket packet)
         {
-            RemoveEntityEffectPacket RemoveEntityEffect = (RemoveEntityEffectPacket)packet;
+            var RemoveEntityEffect = (RemoveEntityEffectPacket) packet;
 
             if (Player.EntityID == RemoveEntityEffect.EntityID)
             {
@@ -366,7 +362,7 @@ namespace MineLib.ClientWrapper
             else
             {
                 if (!Entities.ContainsKey(RemoveEntityEffect.EntityID))
-                    Entities.Add(RemoveEntityEffect.EntityID, new Entity { EntityID = RemoveEntityEffect.EntityID });
+                    Entities.Add(RemoveEntityEffect.EntityID, new Entity {EntityID = RemoveEntityEffect.EntityID});
 
                 Entities[RemoveEntityEffect.EntityID].Effects.Remove(RemoveEntityEffect.EntityID);
             }
@@ -374,7 +370,7 @@ namespace MineLib.ClientWrapper
 
         private void OnSetExperience(IPacket packet)
         {
-            SetExperiencePacket SetExperience = (SetExperiencePacket) packet;
+            var SetExperience = (SetExperiencePacket) packet;
 
             Player.Experience.ExperienceBar = SetExperience.ExperienceBar;
             Player.Experience.Level = SetExperience.Level;
@@ -383,18 +379,17 @@ namespace MineLib.ClientWrapper
 
         private void OnEntityProperties(IPacket packet)
         {
-            EntityPropertiesPacket EntityProperties = (EntityPropertiesPacket)packet;
+            var EntityProperties = (EntityPropertiesPacket) packet;
 
             if (!Entities.ContainsKey(EntityProperties.EntityID))
-                Entities.Add(EntityProperties.EntityID, new Entity { EntityID = EntityProperties.EntityID });
+                Entities.Add(EntityProperties.EntityID, new Entity {EntityID = EntityProperties.EntityID});
 
             Entities[EntityProperties.EntityID].Properties = EntityProperties.Properties;
-
         }
 
         private void OnChunkData(IPacket packet)
         {
-            ChunkDataPacket ChunkData = (ChunkDataPacket) packet;
+            var ChunkData = (ChunkDataPacket) packet;
 
             if (ChunkData.PrimaryBitMap == 0)
             {
@@ -418,8 +413,8 @@ namespace MineLib.ClientWrapper
             byte[] decompressedData = Decompressor.Decompress(ChunkData.Trim);
 
             // -- Create new chunk
-            Chunk newChunk = new Chunk((int) ChunkData.Coordinates.X, (int) ChunkData.Coordinates.Z,
-                ChunkData.PrimaryBitMap, ChunkData.AddBitMap, true, ChunkData.GroundUpContinuous); 
+            var newChunk = new Chunk((int) ChunkData.Coordinates.X, (int) ChunkData.Coordinates.Z,
+                ChunkData.PrimaryBitMap, ChunkData.AddBitMap, true, ChunkData.GroundUpContinuous);
             // -- Skylight assumed true
             newChunk.GetData(decompressedData);
 
@@ -434,29 +429,25 @@ namespace MineLib.ClientWrapper
 
         private void OnMultiBlockChange(IPacket packet)
         {
-
         }
 
         private void OnBlockChange(IPacket packet)
         {
-
         }
 
         private void OnBlockAction(IPacket packet)
         {
-
         }
 
         private void OnBlockBreakAnimation(IPacket packet)
         {
-
         }
 
         private void OnMapChunkBulk(IPacket packet)
         {
-            MapChunkBulkPacket MapChunkBulk = (MapChunkBulkPacket) packet;
+            var MapChunkBulk = (MapChunkBulkPacket) packet;
 
-            Chunk[] chunks = new Chunk[MapChunkBulk.ChunkColumnCount];
+            var chunks = new Chunk[MapChunkBulk.ChunkColumnCount];
 
             Array.Copy(MapChunkBulk.ChunkData, 2, MapChunkBulk.Trim, 0, MapChunkBulk.Trim.Length);
 
@@ -471,7 +462,7 @@ namespace MineLib.ClientWrapper
                     MapChunkBulk.SkyLightSent, true); // -- Assume true for Ground Up Continuous
 
                 DecompressedData = chunks[i].GetData(DecompressedData);
-                    // -- Calls the chunk class to take all of the bytes it needs, and return whats left.
+                // -- Calls the chunk class to take all of the bytes it needs, and return whats left.
 
                 if (World == null)
                     World = new World();
@@ -479,25 +470,23 @@ namespace MineLib.ClientWrapper
                 World.WorldChunks.Add(chunks[i]);
                 i++;
             }
-
         }
 
         private void OnExplosion(IPacket packet)
         {
-
         }
 
         private void OnEffect(IPacket packet)
         {
-            EffectPacket Effect = (EffectPacket) packet;
+            var Effect = (EffectPacket) packet;
 
-            PlayEffect(Effect.EffectID, (int) Effect.X, (byte) (int) Effect.Y,
-                (int) Effect.Z, Effect.Data, Effect.DisableRelativeVolume);
+            PlayEffect(Effect.EffectID, Effect.X, (byte) Effect.Y,
+                Effect.Z, Effect.Data, Effect.DisableRelativeVolume);
         }
 
         private void OnSoundEffect(IPacket packet)
         {
-            SoundEffectPacket SoundEffect = (SoundEffectPacket) packet;
+            var SoundEffect = (SoundEffectPacket) packet;
 
             PlaySound(SoundEffect.SoundName, SoundEffect.X, SoundEffect.Y,
                 SoundEffect.Z, SoundEffect.Volume, SoundEffect.Pitch);
@@ -505,12 +494,11 @@ namespace MineLib.ClientWrapper
 
         private void OnParticle(IPacket packet)
         {
-
         }
 
         private void OnChangeGameState(IPacket packet)
         {
-            ChangeGameStatePacket ChangeGameState = (ChangeGameStatePacket)packet;
+            var ChangeGameState = (ChangeGameStatePacket) packet;
 
             World.StateChanged.Reason = ChangeGameState.Reason;
             World.StateChanged.Value = ChangeGameState.Value;
@@ -518,12 +506,11 @@ namespace MineLib.ClientWrapper
 
         private void OnSpawnGlobalEntity(IPacket packet)
         {
-
         }
 
         private void OnOpenWindow(IPacket packet)
         {
-            OpenWindowPacket OpenWindow = (OpenWindowPacket) packet;
+            var OpenWindow = (OpenWindowPacket) packet;
 
             Player.OpenWindow(OpenWindow.WindowID, OpenWindow.InventoryType, OpenWindow.WindowTitle,
                 OpenWindow.NumberOfSlots, OpenWindow.UseProvidedTitle, OpenWindow.EntityID);
@@ -531,33 +518,33 @@ namespace MineLib.ClientWrapper
 
         private void OnCloseWindow(IPacket packet)
         {
-            CloseWindowPacket CloseWindow = (CloseWindowPacket)packet;
+            var CloseWindow = (CloseWindowPacket) packet;
 
             Player.CloseWindow(CloseWindow.WindowID);
         }
 
         private void OnSetSlot(IPacket packet)
         {
-            SetSlotPacket SetSlot = (SetSlotPacket) packet;
+            var SetSlot = (SetSlotPacket) packet;
 
             Player.SetSlot(SetSlot.WindowId, SetSlot.Slot, SetSlot.SlotData);
         }
 
         private void OnWindowItems(IPacket packet)
         {
-            WindowItemsPacket WindowItems = (WindowItemsPacket) packet;
+            var WindowItems = (WindowItemsPacket) packet;
 
             Player.SetWindowItems(WindowItems.WindowId, WindowItems.SlotData);
         }
 
         private void OnWindowProperty(IPacket packet)
         {
-            WindowPropertyPacket WindowProperty = (WindowPropertyPacket) packet;
+            var WindowProperty = (WindowPropertyPacket) packet;
         }
 
         private void OnConfirmTransaction(IPacket packet)
         {
-            ConfirmTransactionPacket ConfirmTransaction = (ConfirmTransactionPacket) packet;
+            var ConfirmTransaction = (ConfirmTransactionPacket) packet;
 
             Player.ConfirmTransaction(ConfirmTransaction.WindowId, ConfirmTransaction.ActionNumber,
                 ConfirmTransaction.Accepted);
@@ -565,29 +552,26 @@ namespace MineLib.ClientWrapper
 
         private void OnUpdateSign(IPacket packet)
         {
-
         }
 
         private void OnMaps(IPacket packet)
         {
-
         }
 
         private void OnUpdateBlockEntity(IPacket packet)
         {
-
         }
 
         private void OnSignEditorOpen(IPacket packet)
         {
-            SignEditorOpenPacket SignEditorOpen = (SignEditorOpenPacket)packet;
+            var SignEditorOpen = (SignEditorOpenPacket) packet;
 
             EditSign(SignEditorOpen.X, SignEditorOpen.Y, SignEditorOpen.Z);
         }
 
         private void OnStatistics(IPacket packet)
         {
-            StatisticsPacket Statistics = (StatisticsPacket) packet;
+            var Statistics = (StatisticsPacket) packet;
 
             Player.Statistics.Count = Statistics.Count;
             Player.Statistics.StatisticsName = Statistics.StatisticsName;
@@ -596,7 +580,7 @@ namespace MineLib.ClientWrapper
 
         private void OnPlayerListItem(IPacket packet)
         {
-            PlayerListItemPacket PlayerListItem = (PlayerListItemPacket) packet;
+            var PlayerListItem = (PlayerListItemPacket) packet;
 
             // Maybe Clear PlayerList?
             if (!PlayerList.ContainsKey(PlayerListItem.PlayerName))
@@ -605,7 +589,7 @@ namespace MineLib.ClientWrapper
 
         private void OnPlayerAbilities(IPacket packet)
         {
-            PlayerAbilitiesPacket PlayerAbilities = (PlayerAbilitiesPacket) packet;
+            var PlayerAbilities = (PlayerAbilitiesPacket) packet;
             Player.Abilities.Flags = PlayerAbilities.Flags;
             Player.Abilities.FlyingSpeed = PlayerAbilities.FlyingSpeed;
             Player.Abilities.WalkingSpeed = PlayerAbilities.WalkingSpeed;
@@ -613,32 +597,27 @@ namespace MineLib.ClientWrapper
 
         private void OnTabComplete(IPacket packet)
         {
-
         }
 
         private void OnScoreboardObjective(IPacket packet)
         {
-
         }
 
         private void OnUpdateScore(IPacket packet)
         {
-
         }
 
         private void OnDisplayScoreboard(IPacket packet)
         {
-
         }
 
         private void OnTeams(IPacket packet)
         {
-
         }
 
         private void OnPluginMessage(IPacket packet)
         {
-            PluginMessagePacket PluginMessage = (PluginMessagePacket)packet;
+            var PluginMessage = (PluginMessagePacket) packet;
 
             switch (PluginMessage.Channel)
             {
@@ -649,16 +628,12 @@ namespace MineLib.ClientWrapper
                 default:
                     break;
             }
-            
-
         }
 
         private void OnDisconnect(IPacket packet)
         {
-
         }
 
         #endregion
-
     }
 }

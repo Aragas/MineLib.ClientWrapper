@@ -21,8 +21,7 @@ namespace MineLib.ClientWrapper.Data.Anvil
             ChunkX = chunkX;
             ChunkZ = chunkZ;
 
-            Name = ((Blocks)ID).ToString();
+            Name = ((Blocks) ID).ToString();
         }
-
     }
 }

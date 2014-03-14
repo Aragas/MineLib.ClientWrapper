@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Text;
 using MineLib.ClientWrapper.BigData;
+using MineLib.Network.BaseClients;
 using MineLib.Network.Enums;
 using MineLib.Network.Packets;
 using MineLib.Network.Packets.Client;
@@ -12,17 +13,17 @@ namespace MineLib.ClientWrapper
     public static class TestClient
     {
         public static World World;
-        static Minecraft Client;
-        static List<IPacket> list = new List<IPacket>();
-        static NetworkStream nStream;
+        private static Minecraft Client;
+        private static readonly List<IPacket> list = new List<IPacket>();
+        private static NetworkStream nStream;
 
         public static void Main(string[] args)
         {
             Client = new Minecraft("TestBot", "", false);
 
-            using (StatusClient SClient = new StatusClient("127.0.0.1", 25565))
+            using (var SClient = new StatusClient("127.0.0.1", 25565))
             {
-                var info = SClient.GetServerInfo(4);
+                ResponseData info = SClient.GetServerInfo(4);
                 //Console.Read();
             }
 

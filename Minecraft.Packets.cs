@@ -6,11 +6,10 @@ namespace MineLib.ClientWrapper
 {
     public partial class Minecraft
     {
+        private readonly List<IPacket> packets = new List<IPacket>();
         public bool Ready;
 
-        List<IPacket> packets = new List<IPacket>();
-
-        void RaisePacketHandled(IPacket packet, int id, ServerState state)
+        private void RaisePacketHandled(IPacket packet, int id, ServerState state)
         {
             packets.Add(packet);
             Ready = true;
@@ -20,7 +19,8 @@ namespace MineLib.ClientWrapper
                 case ServerState.Login:
 
                     #region Login
-                    switch ((PacketsServer)id)
+
+                    switch ((PacketsServer) id)
                     {
                         case PacketsServer.LoginDisconnect:
                             // Stop.
@@ -34,6 +34,7 @@ namespace MineLib.ClientWrapper
                             State = ServerState.Play;
                             break;
                     }
+
                     #endregion Login
 
                     break;
@@ -41,7 +42,8 @@ namespace MineLib.ClientWrapper
                 case ServerState.Play:
 
                     #region Play
-                    switch ((PacketsServer)id)
+
+                    switch ((PacketsServer) id)
                     {
                         case PacketsServer.KeepAlive:
                             OnKeepAlive(packet);
@@ -302,7 +304,8 @@ namespace MineLib.ClientWrapper
                         case PacketsServer.Disconnect:
                             OnDisconnect(packet);
                             break;
-                        }
+                    }
+
                     #endregion
 
                     break;
@@ -310,7 +313,8 @@ namespace MineLib.ClientWrapper
                 case ServerState.Status:
 
                     #region Status
-                    switch ((PacketsServer)id)
+
+                    switch ((PacketsServer) id)
                     {
                         case PacketsServer.Response:
                             //State = ServerState.Play;
@@ -320,6 +324,7 @@ namespace MineLib.ClientWrapper
                             //State = ServerState.Play;
                             break;
                     }
+
                     #endregion Status
 
                     break;
@@ -329,8 +334,6 @@ namespace MineLib.ClientWrapper
                         FirePacketHandled(packet, id, state);
                     break;
             }
-
         }
-
     }
 }

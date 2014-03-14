@@ -9,57 +9,68 @@ using MineLib.Network.Packets.Client;
 namespace MineLib.ClientWrapper
 {
     /// <summary>
-    /// Wrapper for Network of MineLib.Net.
+    ///     Wrapper for Network of MineLib.Net.
     /// </summary>
     public partial class Minecraft : IMinecraft, IDisposable
     {
         #region Variables
-        private string _serverIp;
-        public string ServerIP { get { return _serverIp; } set { _serverIp = value; } }
 
-        private short _serverPort;
-        public short ServerPort { get { return _serverPort; } set { _serverPort = value; } }
-
-        private ServerState _serverState;
-        public ServerState State { get { return _serverState; } set { _serverState = value; } }
-
+        private string _accessToken;
         private string _clientName;
-        public string ClientName { get { return _clientName; } set { _clientName = value; } }
+        private string _clientToken;
+        private string _selectedProfile;
+
+        public string AccessToken
+        {
+            get { return _accessToken; }
+            set { _accessToken = value; }
+        }
+
+        public string ClientName
+        {
+            get { return _clientName; }
+            set { _clientName = value; }
+        }
+
+        public string ClientToken
+        {
+            get { return _clientToken; }
+            set { _clientToken = value; }
+        }
+
+        public string SelectedProfile
+        {
+            get { return _selectedProfile; }
+            set { _selectedProfile = value; }
+        }
 
         public string ClientPassword { get; set; }
 
-        private string _accessToken;
-        public string AccessToken { get { return _accessToken; } set { _accessToken = value; } }
+        public string ClientBrand { get; set; }
 
-        private string _clientToken;
-        public string ClientToken { get { return _clientToken; } set { _clientToken = value; } }
+        public string ServerBrand { get; set; }
 
-        private string _selectedProfile;
-        public string SelectedProfile { get { return _selectedProfile; } set { _selectedProfile = value; } }
+        public bool VerifyNames { get; set; }
 
-        private string _clientBrand;
-        public string ClientBrand { get { return _clientBrand; } set { _clientBrand = value; } }
+        public string ServerIP { get; set; }
 
-        private string _serverBrand;
-        public string ServerBrand { get { return _serverBrand; } set { _serverBrand = value; } }
+        public short ServerPort { get; set; }
 
-        private bool _verifyName;
-        public bool VerifyNames { get { return _verifyName; } set { _verifyName = value; } }
+        public ServerState State { get; set; }
 
-        private bool _running;
-        public bool Running { get { return _running; } set { _running = value; } }
+        public bool Running { get; set; }
 
         #endregion Variables
 
+        public Dictionary<int, Entity> Entities;
         public NetworkHandler Handler;
 
-        public World World; // -- Holds all of the world information. Time, chunks, ect.
         public ThisPlayer Player; // -- Holds all user information, location, inventory and so on.
         public Dictionary<string, short> PlayerList;
-        public Dictionary<int, Entity> Entities;
+        public World World; // -- Holds all of the world information. Time, chunks, ect.
 
         /// <summary>
-        /// Create a new Minecraft Instance
+        ///     Create a new Minecraft Instance
         /// </summary>
         /// <param name="username">The username to use when connecting to Minecraft</param>
         /// <param name="password">The password to use when connecting to Minecraft (Ignore if you are providing credentials)</param>
@@ -73,7 +84,7 @@ namespace MineLib.ClientWrapper
         }
 
         /// <summary>
-        /// Login to Minecraft.net and store credentials
+        ///     Login to Minecraft.net and store credentials
         /// </summary>
         public void Login()
         {
@@ -97,11 +108,10 @@ namespace MineLib.ClientWrapper
                 AccessToken = "None";
                 SelectedProfile = "None";
             }
-
         }
 
         /// <summary>
-        /// Uses a client's stored credentials to verify with Minecraft.net
+        ///     Uses a client's stored credentials to verify with Minecraft.net
         /// </summary>
         public bool RefreshSession()
         {
@@ -122,7 +132,7 @@ namespace MineLib.ClientWrapper
         }
 
         /// <summary>
-        /// Uses a client's stored credentials to verify with Minecraft.net
+        ///     Uses a client's stored credentials to verify with Minecraft.net
         /// </summary>
         /// <param name="accessToken">Stored Access Token</param>
         /// <param name="clientToken">Stored Client Token</param>
@@ -148,7 +158,7 @@ namespace MineLib.ClientWrapper
         }
 
         /// <summary>
-        /// Connects to the Minecraft Server.
+        ///     Connects to the Minecraft Server.
         /// </summary>
         /// <param name="ip">The IP of the server to connect to</param>
         /// <param name="port">The port of the server to connect to</param>
@@ -163,7 +173,7 @@ namespace MineLib.ClientWrapper
             World = new World();
             Player = new ThisPlayer();
             PlayerList = new Dictionary<string, short>();
-            Entities = new Dictionary<int, Entity>(); 
+            Entities = new Dictionary<int, Entity>();
 
             Handler = new NetworkHandler(this);
 
@@ -175,7 +185,7 @@ namespace MineLib.ClientWrapper
         }
 
         /// <summary>
-        /// Send IPacket to the Minecraft Server.
+        ///     Send IPacket to the Minecraft Server.
         /// </summary>
         /// <param name="packet">IPacket to sent to server</param>
         public void SendPacket(IPacket packet)
@@ -186,11 +196,11 @@ namespace MineLib.ClientWrapper
 
         public void SendChatMessage(string message)
         {
-            Handler.Send(new ChatMessagePacket { Message = message });
+            Handler.Send(new ChatMessagePacket {Message = message});
         }
 
         /// <summary>
-        /// Disconnects from the Minecraft server.
+        ///     Disconnects from the Minecraft server.
         /// </summary>
         public void Disconnect()
         {

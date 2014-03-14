@@ -7,13 +7,11 @@ namespace MineLib.ClientWrapper
         private void PlaySound(string SoundName, int X, int Y, int Z,
             float Volume, byte Pitch)
         {
-
         }
 
         private void PlayEffect(int EffectID, int X, byte Y, int Z,
             int Data, bool DisableRelativeVolume)
         {
-
         }
 
         private void DisplayChatMessage(string message)
@@ -54,12 +52,10 @@ namespace MineLib.ClientWrapper
             Console.WriteLine(text);
             //Console.WriteLine(colour);
             //Console.Read();
-
         }
 
         private void EditSign(int x, int y, int z)
         {
-            
         }
     }
 }

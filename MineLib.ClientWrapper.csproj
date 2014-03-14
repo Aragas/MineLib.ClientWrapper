@@ -53,8 +53,6 @@
     <Compile Include="Minecraft.cs" />
     <Compile Include="Minecraft.Events.cs" />
     <Compile Include="Minecraft.Packets.cs" />
-    <Compile Include="StatusClient.cs" />
-    <Compile Include="StatusClient.Events.cs" />
     <Compile Include="TestClient.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -62,9 +60,6 @@
       <Project>{e7c8320e-49a4-4187-afe3-15c814201e1e}</Project>
       <Name>MineLib.Network</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="StatusClient.Packets.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>

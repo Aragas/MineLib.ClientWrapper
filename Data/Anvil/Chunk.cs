@@ -34,7 +34,7 @@ namespace MineLib.ClientWrapper.Data.Anvil
         }
 
         /// <summary>
-        /// Creates the chunk sections for this column based on the primary and add bitmasks.
+        ///     Creates the chunk sections for this column based on the primary and add bitmasks.
         /// </summary>
         private void CreateSections()
         {
@@ -58,7 +58,7 @@ namespace MineLib.ClientWrapper.Data.Anvil
         }
 
         /// <summary>
-        /// Populates the chunk sections contained in this chunk column with their information.
+        ///     Populates the chunk sections contained in this chunk column with their information.
         /// </summary>
         private void Populate()
         {
@@ -68,11 +68,10 @@ namespace MineLib.ClientWrapper.Data.Anvil
             {
                 if ((PrimaryBitMap & (1 << i)) != 0)
                 {
-
-                    byte[] temp = new byte[4096];
-                    byte[] temp2 = new byte[2048];
-                    byte[] temp3 = new byte[2048];
-                    byte[] temp4 = new byte[2048];
+                    var temp = new byte[4096];
+                    var temp2 = new byte[2048];
+                    var temp3 = new byte[2048];
+                    var temp4 = new byte[2048];
 
                     Buffer.BlockCopy(BlocksType, offset, temp, 0, 4096); // -- Block IDs
                     Buffer.BlockCopy(BlocksMetadata, metaOff, temp2, 0, 2048); // -- Metadata.
@@ -102,18 +101,18 @@ namespace MineLib.ClientWrapper.Data.Anvil
         }
 
         /// <summary>
-        /// Expand the compressed Metadata (half-byte per block) into single-byte per block for easier reading.
+        ///     Expand the compressed Metadata (half-byte per block) into single-byte per block for easier reading.
         /// </summary>
         /// <param name="oldMeta">Old (2048-byte) Metadata</param>
         /// <returns>4096 uncompressed Metadata</returns>
         public byte[] CreateMetadataBytes(byte[] oldMeta)
         {
-            byte[] newMeta = new byte[4096];
+            var newMeta = new byte[4096];
 
             for (int i = 0; i < oldMeta.Length; i++)
             {
-                byte block2 = (byte) ((oldMeta[i] >> 4) & 15);
-                byte block1 = (byte) (oldMeta[i] & 15);
+                var block2 = (byte) ((oldMeta[i] >> 4) & 15);
+                var block1 = (byte) (oldMeta[i] & 15);
 
                 newMeta[(i*2)] = block1;
                 newMeta[(i*2) + 1] = block2;
@@ -123,7 +122,7 @@ namespace MineLib.ClientWrapper.Data.Anvil
         }
 
         /// <summary>
-        /// Takes this chunk's portion of data from a byte array.
+        ///     Takes this chunk's portion of data from a byte array.
         /// </summary>
         /// <param name="deCompressed">The byte array containing this chunk's data at the front.</param>
         /// <returns>The byte array with this chunk's bytes removed.</returns>
@@ -194,7 +193,6 @@ namespace MineLib.ClientWrapper.Data.Anvil
 
             Section thisSection = GetSectionByNumber(By);
             thisSection.SetBlock(GetXinSection(Bx), GetPositionInSection(By), GetZinSection(Bz), id);
-
         }
 
         public int GetBlockId(int Bx, int By, int Bz)
@@ -224,25 +222,25 @@ namespace MineLib.ClientWrapper.Data.Anvil
 
         public byte GetBlockLight(int x, int y, int z)
         {
-            var thisSection = GetSectionByNumber(y);
+            Section thisSection = GetSectionByNumber(y);
             return thisSection.GetBlockLighting(GetXinSection(x), GetPositionInSection(y), GetZinSection(z));
         }
 
         public void SetBlockLight(int x, int y, int z, byte light)
         {
-            var thisSection = GetSectionByNumber(y);
+            Section thisSection = GetSectionByNumber(y);
             thisSection.SetBlockLighting(GetXinSection(x), GetPositionInSection(y), GetZinSection(z), light);
         }
 
         public byte GetBlockSkylight(int x, int y, int z)
         {
-            var thisSection = GetSectionByNumber(y);
+            Section thisSection = GetSectionByNumber(y);
             return thisSection.GetBlockSkylight(GetXinSection(x), GetPositionInSection(y), GetZinSection(z));
         }
 
         public void SetBlockSkylight(int x, int y, int z, byte light)
         {
-            var thisSection = GetSectionByNumber(y);
+            Section thisSection = GetSectionByNumber(y);
             thisSection.SetBlockSkylight(GetXinSection(x), GetPositionInSection(y), GetZinSection(z), light);
         }
 
