@@ -15,34 +15,13 @@ namespace MineLib.ClientWrapper
     {
         #region Variables
 
-        private string _accessToken;
-        private string _clientName;
-        private string _clientToken;
-        private string _selectedProfile;
+        public string AccessToken { get; set; }
 
-        public string AccessToken
-        {
-            get { return _accessToken; }
-            set { _accessToken = value; }
-        }
+        public string ClientName { get; set; }
 
-        public string ClientName
-        {
-            get { return _clientName; }
-            set { _clientName = value; }
-        }
+        public string ClientToken { get; set; }
 
-        public string ClientToken
-        {
-            get { return _clientToken; }
-            set { _clientToken = value; }
-        }
-
-        public string SelectedProfile
-        {
-            get { return _selectedProfile; }
-            set { _selectedProfile = value; }
-        }
+        public string SelectedProfile { get; set; }
 
         public string ClientPassword { get; set; }
 
@@ -58,9 +37,9 @@ namespace MineLib.ClientWrapper
 
         public ServerState State { get; set; }
 
-        public bool Running { get; set; }
-
         #endregion Variables
+
+        public bool Connected { get { return Handler.Connected; }}
 
         public Dictionary<int, Entity> Entities;
         public NetworkHandler Handler;
@@ -81,6 +60,9 @@ namespace MineLib.ClientWrapper
             ClientPassword = password;
             VerifyNames = nameVerification;
             ClientBrand = "MineLib.Net"; // -- Used in the plugin message reporting the client brand to the server.
+
+            if(VerifyNames)
+                Login();
         }
 
         /// <summary>
@@ -90,12 +72,14 @@ namespace MineLib.ClientWrapper
         {
             if (VerifyNames)
             {
-                YggdrasilStatus result = Yggdrasil.LoginAuthServer(ref _clientName, ClientPassword, ref _accessToken,
-                    ref _clientToken, ref _selectedProfile);
+                var result = Yggdrasil.Login(ClientName, ClientPassword);
 
-                switch (result)
+                switch (result.Status)
                 {
                     case YggdrasilStatus.Success:
+                        AccessToken = result.Response.AccessToken;
+                        ClientToken = result.Response.ClientToken;
+                        SelectedProfile = result.Response.Profile.ID;
                         break;
 
                     default:
@@ -119,11 +103,13 @@ namespace MineLib.ClientWrapper
                 return false;
 
 
-            YggdrasilStatus result = Yggdrasil.RefreshSession(ref _accessToken, ref _clientToken);
+            var result = Yggdrasil.RefreshSession(AccessToken, ClientToken);
 
-            switch (result)
+            switch (result.Status)
             {
                 case YggdrasilStatus.Success:
+                    AccessToken = result.Response.AccessToken;
+                    ClientToken = result.Response.ClientToken;
                     return true;
 
                 default:
@@ -145,11 +131,13 @@ namespace MineLib.ClientWrapper
                 return false;
 
 
-            YggdrasilStatus result = Yggdrasil.RefreshSession(ref _accessToken, ref _clientToken);
+            var result = Yggdrasil.RefreshSession(AccessToken, ClientToken);
 
-            switch (result)
+            switch (result.Status)
             {
                 case YggdrasilStatus.Success:
+                    AccessToken = result.Response.AccessToken;
+                    ClientToken = result.Response.ClientToken;
                     return true;
 
                 default:
@@ -190,13 +178,14 @@ namespace MineLib.ClientWrapper
         /// <param name="packet">IPacket to sent to server</param>
         public void SendPacket(IPacket packet)
         {
-            if (Handler != null)
+            if (Handler != null && Connected)
                 Handler.Send(packet);
         }
 
         public void SendChatMessage(string message)
         {
-            Handler.Send(new ChatMessagePacket {Message = message});
+            if (Handler != null && Connected)
+                Handler.Send(new ChatMessagePacket {Message = message});
         }
 
         /// <summary>
@@ -209,7 +198,6 @@ namespace MineLib.ClientWrapper
 
             // -- Reset all variables to default so we can make a new connection.
 
-            Running = false;
             State = ServerState.Login;
 
             World = null;

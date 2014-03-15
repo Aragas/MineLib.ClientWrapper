@@ -6,7 +6,7 @@ namespace MineLib.ClientWrapper
 {
     public partial class Minecraft
     {
-        private readonly List<IPacket> packets = new List<IPacket>();
+        List<IPacket> packets = new List<IPacket>();
         public bool Ready;
 
         private void RaisePacketHandled(IPacket packet, int id, ServerState state)

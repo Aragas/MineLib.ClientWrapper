@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Net.Sockets;
 using System.Text;
-using MineLib.ClientWrapper.BigData;
 using MineLib.Network.BaseClients;
 using MineLib.Network.Enums;
 using MineLib.Network.Packets;
@@ -12,23 +11,15 @@ namespace MineLib.ClientWrapper
 {
     public static class TestClient
     {
-        public static World World;
         private static Minecraft Client;
-        private static readonly List<IPacket> list = new List<IPacket>();
         private static NetworkStream nStream;
+        private static ResponseData ServerData;
 
         public static void Main(string[] args)
         {
             Client = new Minecraft("TestBot", "", false);
 
-            using (var SClient = new StatusClient("127.0.0.1", 25565))
-            {
-                ResponseData info = SClient.GetServerInfo(4);
-                //Console.Read();
-            }
-
-            //Client.Login();
-            //Client.RefreshSession();
+            Client.RefreshSession();
 
             /*
              Connect()
@@ -38,14 +29,17 @@ namespace MineLib.ClientWrapper
              
              */
 
-            Client.FirePacketHandled += Client_PacketHandled;
+            using (var SClient = new StatusClient("localhost", 25565))
+            {
+                ServerData = SClient.GetServerInfo(4);
+            }
 
-            Client.Connect("127.0.0.1", 25565);
+            Client.Connect("localhost", 25565);
 
             Client.SendPacket(new HandshakePacket
             {
                 ProtocolVersion = 4,
-                ServerAddress = "127.0.0.1",
+                ServerAddress = "localhost",
                 ServerPort = 25565,
                 NextState = NextState.Login,
             });
@@ -65,11 +59,7 @@ namespace MineLib.ClientWrapper
             
             while (true) {}
 
-        }
-
-        private static void Client_PacketHandled(IPacket packet, int id, ServerState state)
-        {
-            list.Add(packet);
+            Console.Read();
         }
     }
 }
