@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Sockets;
 using System.Text;
 using MineLib.Network.BaseClients;
 using MineLib.Network.Enums;
@@ -12,11 +11,13 @@ namespace MineLib.ClientWrapper
     public static class TestClient
     {
         private static Minecraft Client;
-        private static NetworkStream nStream;
         private static ResponseData ServerData;
 
         public static void Main(string[] args)
         {
+            string ServerIP = args[0];                  // localhost
+            short ServerPort = short.Parse(args[1]);    // 25565
+
             Client = new Minecraft("TestBot", "", false);
 
             Client.RefreshSession();
@@ -29,18 +30,18 @@ namespace MineLib.ClientWrapper
              
              */
 
-            using (var SClient = new StatusClient("localhost", 25565))
+            using (var SClient = new StatusClient(ServerIP, ServerPort))
             {
                 ServerData = SClient.GetServerInfo(4);
             }
 
-            Client.Connect("localhost", 25565);
+            Client.Connect(ServerIP, ServerPort);
 
             Client.SendPacket(new HandshakePacket
             {
                 ProtocolVersion = 4,
-                ServerAddress = "localhost",
-                ServerPort = 25565,
+                ServerAddress = ServerIP,
+                ServerPort = ServerPort,
                 NextState = NextState.Login,
             });
 

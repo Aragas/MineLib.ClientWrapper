@@ -339,9 +339,10 @@ namespace MineLib.ClientWrapper
             }
             else
             {
-                if (!Entities.ContainsKey(EntityEffect.EntityID))
-                    Entities.Add(EntityEffect.EntityID, new Entity {EntityID = EntityEffect.EntityID});
+                if (Entities.ContainsKey(EntityEffect.EntityID)) 
+                    return;
 
+                Entities.Add(EntityEffect.EntityID, new Entity {EntityID = EntityEffect.EntityID});
                 Entities[EntityEffect.EntityID].Effects.Add(EntityEffect.EntityID, new EntityEffect
                 {
                     EffectID = EntityEffect.EffectID,

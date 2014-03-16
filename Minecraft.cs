@@ -68,7 +68,7 @@ namespace MineLib.ClientWrapper
         /// <summary>
         ///     Login to Minecraft.net and store credentials
         /// </summary>
-        public void Login()
+        private void Login()
         {
             if (VerifyNames)
             {
