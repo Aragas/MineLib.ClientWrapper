@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using MineLib.ClientWrapper.BigData;
 using MineLib.Network;
@@ -13,6 +14,22 @@ namespace MineLib.ClientWrapper
     /// </summary>
     public partial class Minecraft : IMinecraft, IDisposable
     {
+        // -- Debugging
+        public List<IPacket> LastPackets
+        {
+            get
+            {
+                try
+                {
+                    return packets.Skip(Math.Max(0, packets.Count() - 50)).Take(50).ToList();
+                }
+                catch { }
+                return null;
+            }
+        }
+        public IPacket LastPacket { get { return packets[packets.Count - 1]; } }
+        // -- Debugging
+
         #region Variables
 
         public string AccessToken { get; set; }
@@ -41,12 +58,13 @@ namespace MineLib.ClientWrapper
 
         public bool Connected { get { return Handler.Connected; }}
 
-        public Dictionary<int, Entity> Entities;
         public NetworkHandler Handler;
+        public PlayerHandler PlayerHandler;
 
-        public ThisPlayer Player; // -- Holds all user information, location, inventory and so on.
-        public Dictionary<string, short> PlayerList;
-        public World World; // -- Holds all of the world information. Time, chunks, ect.
+        public World World;
+        public Player Player;
+        public Dictionary<int, Entity> Entities;
+        public Dictionary<string, short> PlayersList;
 
         /// <summary>
         ///     Create a new Minecraft Instance
@@ -66,86 +84,6 @@ namespace MineLib.ClientWrapper
         }
 
         /// <summary>
-        ///     Login to Minecraft.net and store credentials
-        /// </summary>
-        private void Login()
-        {
-            if (VerifyNames)
-            {
-                var result = Yggdrasil.Login(ClientName, ClientPassword);
-
-                switch (result.Status)
-                {
-                    case YggdrasilStatus.Success:
-                        AccessToken = result.Response.AccessToken;
-                        ClientToken = result.Response.ClientToken;
-                        SelectedProfile = result.Response.Profile.ID;
-                        break;
-
-                    default:
-                        VerifyNames = false; // -- Fall back to no auth.
-                        break;
-                }
-            }
-            else
-            {
-                AccessToken = "None";
-                SelectedProfile = "None";
-            }
-        }
-
-        /// <summary>
-        ///     Uses a client's stored credentials to verify with Minecraft.net
-        /// </summary>
-        public bool RefreshSession()
-        {
-            if (AccessToken == null || ClientToken == null)
-                return false;
-
-
-            var result = Yggdrasil.RefreshSession(AccessToken, ClientToken);
-
-            switch (result.Status)
-            {
-                case YggdrasilStatus.Success:
-                    AccessToken = result.Response.AccessToken;
-                    ClientToken = result.Response.ClientToken;
-                    return true;
-
-                default:
-                    return false;
-            }
-        }
-
-        /// <summary>
-        ///     Uses a client's stored credentials to verify with Minecraft.net
-        /// </summary>
-        /// <param name="accessToken">Stored Access Token</param>
-        /// <param name="clientToken">Stored Client Token</param>
-        public bool RefreshSession(string accessToken, string clientToken)
-        {
-            AccessToken = accessToken;
-            ClientToken = clientToken;
-
-            if (AccessToken == null || ClientToken == null)
-                return false;
-
-
-            var result = Yggdrasil.RefreshSession(AccessToken, ClientToken);
-
-            switch (result.Status)
-            {
-                case YggdrasilStatus.Success:
-                    AccessToken = result.Response.AccessToken;
-                    ClientToken = result.Response.ClientToken;
-                    return true;
-
-                default:
-                    return false;
-            }
-        }
-
-        /// <summary>
         ///     Connects to the Minecraft Server.
         /// </summary>
         /// <param name="ip">The IP of the server to connect to</param>
@@ -159,11 +97,12 @@ namespace MineLib.ClientWrapper
                 Disconnect();
 
             World = new World();
-            Player = new ThisPlayer();
-            PlayerList = new Dictionary<string, short>();
+            Player = new Player();
             Entities = new Dictionary<int, Entity>();
+            PlayersList = new Dictionary<string, short>();
 
             Handler = new NetworkHandler(this);
+            PlayerHandler = new PlayerHandler(ref Handler, ref Player);
 
             // -- Register our event handlers.
             Handler.OnPacketHandled += RaisePacketHandled;
@@ -194,15 +133,14 @@ namespace MineLib.ClientWrapper
         public void Disconnect()
         {
             if (Handler != null)
-                Handler.Stop();
+                Handler.Dispose();
 
             // -- Reset all variables to default so we can make a new connection.
-
             State = ServerState.Login;
 
             World = null;
             Player = null;
-            PlayerList = null;
+            PlayersList = null;
             Entities = null;
         }
 

@@ -10,27 +10,32 @@ namespace MineLib.ClientWrapper.BigData
         public Entity()
         {
             Metadata = new MetadataDictionary();
-            Vehile = new Vehile();
-            Effects = new Dictionary<int, EntityEffect>();
+            Vehicle = new Vehicle();
+            Effects = new List<EntityEffect>();
         }
 
         public int EntityID;
         public MetadataDictionary Metadata;
 
-        public Vehile Vehile;
+        public Vehicle Vehicle;
         public bool Leash;
         public EntityProperty[] Properties;
 
         public EntityStatus Status;
         public EntityEquipment Equipment;
-        public EntityAnimation Animation;
-        public EntityPosition Position;
+        public Animation Animation;
+        public Vector3 Position;
         public EntityLook Look;
-        public Dictionary<int, EntityEffect> Effects;
-        public EntityBed Bed;
+        public List<EntityEffect> Effects;
+        public Vector3 Bed;
         public EntityPlayer Player;
-        public EnityVelocity Velocity;
-        public EnityNewPosition NewPosition;
+        public EntityVelocity Velocity;
+        public EntityNewPosition NewPosition;
+
+        public bool IsPlayer
+        {
+            get { return Player.Name != null && Player.UUID != null; }
+        }
     }
 
     public struct EntityEquipment
@@ -41,56 +46,38 @@ namespace MineLib.ClientWrapper.BigData
         public short CurrentItem;
     }
 
-    public struct EntityUseBed
-    {
-        public int X;
-        public byte Y;
-        public int Z;
-    }
-
-    public struct EntityAnimation
-    {
-        public Animation Animation;
-    }
-
-    public struct EntityPosition
-    {
-        public int X, Y, Z;
-    }
-
     public struct EntityLook
     {
-        public byte Yaw, HeadPitch, Pitch;
+        public byte Yaw;
+        public byte HeadPitch;
+        public byte Pitch;
     }
 
     public struct EntityEffect
     {
-        public byte EffectID;
+        public EffectID EffectID;
         public byte Amplifier;
         public short Duration;
     }
 
-    public struct EntityBed
-    {
-        public int X;
-        public byte Y;
-        public int Z;
-    }
-
     public struct EntityPlayer
     {
-        public string PlayerUUID, PlayerName;
+        public string UUID;
+        public string Name;
     }
 
-    public struct EnityVelocity
+    public struct EntityVelocity
     {
-        public short VelocityX, VelocityY, VelocityZ;
+        public short VelocityX;
+        public short VelocityY;
+        public short VelocityZ;
     }
 
-    public struct EnityNewPosition
+    public struct EntityNewPosition
     {
-        public double X, Y, Z;
-        public float Yaw, Pitch;
+        public Vector3 Vector3;
+        public float Yaw;
+        public float Pitch;
         public bool OnGround;
     }
 

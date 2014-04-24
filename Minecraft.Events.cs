@@ -1,8 +1,6 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Text;
 using MineLib.ClientWrapper.BigData;
-using MineLib.ClientWrapper.Data.Anvil;
-using MineLib.Network.Data;
 using MineLib.Network.Events;
 using MineLib.Network.Packets;
 using MineLib.Network.Packets.Server;
@@ -11,6 +9,10 @@ namespace MineLib.ClientWrapper
 {
     public partial class Minecraft
     {
+        // -- Debugging
+        public List<string> ChatHistory = new List<string>();
+        // -- Debugging
+
         public event PacketsHandler FirePacketHandled;
 
         #region Voids
@@ -39,15 +41,14 @@ namespace MineLib.ClientWrapper
         {
             var ChatMessage = (ChatMessagePacket) packet;
 
+            ChatHistory.Add(ChatMessage.Message);
+
             DisplayChatMessage(ChatMessage.Message);
         }
 
         private void OnTimeUpdate(IPacket packet)
         {
             var TimeUpdate = (TimeUpdatePacket) packet;
-
-            if (Ready)
-                SendPacket(Player.Packet());
 
             World.AgeOfTheWorld = TimeUpdate.AgeOfTheWorld;
             World.TimeOfDay = TimeUpdate.TimeOfDay;
@@ -68,9 +69,7 @@ namespace MineLib.ClientWrapper
         {
             var SpawnPosition = (SpawnPositionPacket) packet;
 
-            World.SpawnPosition.X = SpawnPosition.X;
-            World.SpawnPosition.Y = SpawnPosition.Y;
-            World.SpawnPosition.Z = SpawnPosition.Z;
+            World.SpawnPosition = SpawnPosition.Vector3;
         }
 
         private void OnUpdateHealth(IPacket packet)
@@ -91,6 +90,7 @@ namespace MineLib.ClientWrapper
             World.GameMode = Respawn.GameMode;
             World.LevelType = Respawn.LevelType;
 
+            World.Chunks.Clear();
             // And unload all chunks.
         }
 
@@ -100,9 +100,7 @@ namespace MineLib.ClientWrapper
 
             if (!Player.Position.Initialized)
             {
-                Player.Position.Vector3.X = (int) PlayerPositionAndLook.X;
-                Player.Position.Vector3.Y = (int) PlayerPositionAndLook.Y;
-                Player.Position.Vector3.Z = (int) PlayerPositionAndLook.Z;
+                Player.Position.Vector3 = PlayerPositionAndLook.Vector3;
                 Player.Look.Yaw = PlayerPositionAndLook.Yaw;
                 Player.Look.Pitch = PlayerPositionAndLook.Pitch;
                 Player.Position.OnGround = PlayerPositionAndLook.OnGround;
@@ -111,20 +109,34 @@ namespace MineLib.ClientWrapper
             }
             else
             {
-                Player.NewPosition.X = PlayerPositionAndLook.X;
-                Player.NewPosition.Y = PlayerPositionAndLook.Y;
-                Player.NewPosition.Z = PlayerPositionAndLook.Z;
+                Player.NewPosition.Vector3 = PlayerPositionAndLook.Vector3;
                 Player.NewPosition.Yaw = PlayerPositionAndLook.Yaw;
                 Player.NewPosition.Pitch = PlayerPositionAndLook.Pitch;
                 Player.NewPosition.OnGround = PlayerPositionAndLook.OnGround;
             }
+
+            SendPacket(new Network.Packets.Client.PlayerPositionPacket
+            {
+                X = PlayerPositionAndLook.Vector3.X,
+                HeadY = PlayerPositionAndLook.Vector3.Y,
+                FeetY = PlayerPositionAndLook.Vector3.Y - 1.62,
+                Z = PlayerPositionAndLook.Vector3.Z,
+                OnGround = PlayerPositionAndLook.OnGround
+            });
+
+            SendPacket(new Network.Packets.Client.PlayerLookPacket
+            {
+                Yaw = PlayerPositionAndLook.Yaw,
+                Pitch = PlayerPositionAndLook.Pitch,
+                OnGround = PlayerPositionAndLook.OnGround
+            });
         }
 
         private void OnHeldItemChange(IPacket packet)
         {
             var HeldItemChange = (HeldItemChangePacket) packet;
 
-            Player.HeldItem.Slot = HeldItemChange.Slot;
+            Player.HeldItem = HeldItemChange.Slot;
         }
 
         private void OnUseBed(IPacket packet)
@@ -134,9 +146,7 @@ namespace MineLib.ClientWrapper
             if (!Entities.ContainsKey(UseBed.EntityID))
                 Entities.Add(UseBed.EntityID, new Entity {EntityID = UseBed.EntityID});
 
-            Entities[UseBed.EntityID].Bed.X = UseBed.X;
-            Entities[UseBed.EntityID].Bed.Y = UseBed.Y;
-            Entities[UseBed.EntityID].Bed.Z = UseBed.Z;
+            Entities[UseBed.EntityID].Bed = UseBed.Vector3;
         }
 
         private void OnAnimation(IPacket packet)
@@ -146,7 +156,7 @@ namespace MineLib.ClientWrapper
             if (!Entities.ContainsKey(Animation.EntityID))
                 Entities.Add(Animation.EntityID, new Entity {EntityID = Animation.EntityID});
 
-            Entities[Animation.EntityID].Animation.Animation = Animation.Animation;
+            Entities[Animation.EntityID].Animation = Animation.Animation;
         }
 
         private void OnSpawnPlayer(IPacket packet)
@@ -156,11 +166,9 @@ namespace MineLib.ClientWrapper
             if (!Entities.ContainsKey(SpawnPlayer.EntityID))
                 Entities.Add(SpawnPlayer.EntityID, new Entity {EntityID = SpawnPlayer.EntityID});
 
-            Entities[SpawnPlayer.EntityID].Player.PlayerUUID = SpawnPlayer.PlayerUUID;
-            Entities[SpawnPlayer.EntityID].Player.PlayerName = SpawnPlayer.PlayerName;
-            Entities[SpawnPlayer.EntityID].Position.X = SpawnPlayer.X;
-            Entities[SpawnPlayer.EntityID].Position.Y = SpawnPlayer.Y;
-            Entities[SpawnPlayer.EntityID].Position.Z = SpawnPlayer.Z;
+            Entities[SpawnPlayer.EntityID].Player.UUID = SpawnPlayer.PlayerUUID;
+            Entities[SpawnPlayer.EntityID].Player.Name = SpawnPlayer.PlayerName;
+            Entities[SpawnPlayer.EntityID].Position = SpawnPlayer.Vector3;
             Entities[SpawnPlayer.EntityID].Look.Yaw = SpawnPlayer.Yaw;
             Entities[SpawnPlayer.EntityID].Look.Pitch = SpawnPlayer.Pitch;
             Entities[SpawnPlayer.EntityID].Metadata = SpawnPlayer.Metadata;
@@ -168,6 +176,7 @@ namespace MineLib.ClientWrapper
 
         private void OnCollectItem(IPacket packet)
         {
+            var CollectItem = (CollectItemPacket) packet;
         }
 
         private void OnSpawnObject(IPacket packet)
@@ -182,9 +191,7 @@ namespace MineLib.ClientWrapper
             if (!Entities.ContainsKey(SpawnMob.EntityID))
                 Entities.Add(SpawnMob.EntityID, new Entity {EntityID = SpawnMob.EntityID});
 
-            Entities[SpawnMob.EntityID].Position.X = SpawnMob.X;
-            Entities[SpawnMob.EntityID].Position.Y = SpawnMob.Y;
-            Entities[SpawnMob.EntityID].Position.Z = SpawnMob.Z;
+            Entities[SpawnMob.EntityID].Position = SpawnMob.Vector3;
             Entities[SpawnMob.EntityID].Look.Yaw = SpawnMob.Yaw;
             Entities[SpawnMob.EntityID].Look.HeadPitch = SpawnMob.HeadPitch;
             Entities[SpawnMob.EntityID].Look.Pitch = SpawnMob.Pitch;
@@ -196,10 +203,12 @@ namespace MineLib.ClientWrapper
 
         private void OnSpawnPainting(IPacket packet)
         {
+            var SpawnPainting = (SpawnPaintingPacket) packet;
         }
 
         private void OnSpawnExperienceOrb(IPacket packet)
         {
+            var SpawnExperienceOrb = (SpawnExperienceOrbPacket) packet;
         }
 
         private void OnEntityVelocity(IPacket packet)
@@ -237,9 +246,7 @@ namespace MineLib.ClientWrapper
             if (!Entities.ContainsKey(EntityRelativeMove.EntityID))
                 Entities.Add(EntityRelativeMove.EntityID, new Entity {EntityID = EntityRelativeMove.EntityID});
 
-            Entities[EntityRelativeMove.EntityID].NewPosition.X = EntityRelativeMove.DeltaX;
-            Entities[EntityRelativeMove.EntityID].NewPosition.Y = EntityRelativeMove.DeltaY;
-            Entities[EntityRelativeMove.EntityID].NewPosition.Z = EntityRelativeMove.DeltaZ;
+            Entities[EntityRelativeMove.EntityID].NewPosition.Vector3 = EntityRelativeMove.DeltaVector3; //Nope
         }
 
         private void OnEntityLook(IPacket packet)
@@ -261,9 +268,7 @@ namespace MineLib.ClientWrapper
                 Entities.Add(EntityLookAndRelativeMove.EntityID,
                     new Entity {EntityID = EntityLookAndRelativeMove.EntityID});
 
-            Entities[EntityLookAndRelativeMove.EntityID].NewPosition.X = EntityLookAndRelativeMove.DeltaX;
-            Entities[EntityLookAndRelativeMove.EntityID].NewPosition.Y = EntityLookAndRelativeMove.DeltaY;
-            Entities[EntityLookAndRelativeMove.EntityID].NewPosition.Z = EntityLookAndRelativeMove.DeltaZ;
+            Entities[EntityLookAndRelativeMove.EntityID].NewPosition.Vector3 = EntityLookAndRelativeMove.DeltaVector3; //Nope
             Entities[EntityLookAndRelativeMove.EntityID].NewPosition.Yaw = EntityLookAndRelativeMove.Yaw;
             Entities[EntityLookAndRelativeMove.EntityID].NewPosition.Pitch = EntityLookAndRelativeMove.Pitch;
         }
@@ -275,9 +280,7 @@ namespace MineLib.ClientWrapper
             if (!Entities.ContainsKey(EntityTeleport.EntityID))
                 Entities.Add(EntityTeleport.EntityID, new Entity {EntityID = EntityTeleport.EntityID});
 
-            Entities[EntityTeleport.EntityID].NewPosition.X = EntityTeleport.X;
-            Entities[EntityTeleport.EntityID].NewPosition.Y = EntityTeleport.Y;
-            Entities[EntityTeleport.EntityID].NewPosition.Z = EntityTeleport.Z;
+            Entities[EntityTeleport.EntityID].NewPosition.Vector3 = EntityTeleport.Vector3;
             Entities[EntityTeleport.EntityID].NewPosition.Yaw = EntityTeleport.Yaw;
             Entities[EntityTeleport.EntityID].NewPosition.Pitch = EntityTeleport.Pitch;
         }
@@ -309,7 +312,7 @@ namespace MineLib.ClientWrapper
             if (!Entities.ContainsKey(AttachEntity.EntityID))
                 Entities.Add(AttachEntity.EntityID, new Entity {EntityID = AttachEntity.EntityID});
 
-            Entities[AttachEntity.EntityID].Vehile.VehileID = AttachEntity.VehicleID;
+            Entities[AttachEntity.EntityID].Vehicle.VehicleID = AttachEntity.VehicleID;
             Entities[AttachEntity.EntityID].Leash = AttachEntity.Leash;
         }
 
@@ -329,21 +332,20 @@ namespace MineLib.ClientWrapper
 
             if (Player.EntityID == EntityEffect.EntityID)
             {
-                if (!Player.Effects.ContainsKey(EntityEffect.EffectID))
-                    Player.Effects.Add(EntityEffect.EffectID, new PlayerEffect
-                    {
-                        EffectID = EntityEffect.EffectID,
-                        Amplifier = EntityEffect.Amplifier,
-                        Duration = EntityEffect.Duration
-                    });
+                Player.Effects.Add(new PlayerEffect
+                {
+                    EffectID = EntityEffect.EffectID,
+                    Amplifier = EntityEffect.Amplifier,
+                    Duration = EntityEffect.Duration
+                });
             }
             else
             {
-                if (Entities.ContainsKey(EntityEffect.EntityID)) 
+                if (Entities.ContainsKey(EntityEffect.EntityID))
                     return;
 
                 Entities.Add(EntityEffect.EntityID, new Entity {EntityID = EntityEffect.EntityID});
-                Entities[EntityEffect.EntityID].Effects.Add(EntityEffect.EntityID, new EntityEffect
+                Entities[EntityEffect.EntityID].Effects.Add(new EntityEffect
                 {
                     EffectID = EntityEffect.EffectID,
                     Amplifier = EntityEffect.Amplifier,
@@ -358,14 +360,22 @@ namespace MineLib.ClientWrapper
 
             if (Player.EntityID == RemoveEntityEffect.EntityID)
             {
-                Player.Effects.Remove(RemoveEntityEffect.EntityID);
+                foreach (var effect in Player.Effects.ToArray())
+                {
+                    if (effect.EffectID == RemoveEntityEffect.EffectID)
+                        Player.Effects.Remove(effect);
+                }
             }
             else
             {
                 if (!Entities.ContainsKey(RemoveEntityEffect.EntityID))
                     Entities.Add(RemoveEntityEffect.EntityID, new Entity {EntityID = RemoveEntityEffect.EntityID});
 
-                Entities[RemoveEntityEffect.EntityID].Effects.Remove(RemoveEntityEffect.EntityID);
+                foreach (var effect in Entities[RemoveEntityEffect.EntityID].Effects.ToArray())
+                {
+                    if (effect.EffectID == RemoveEntityEffect.EffectID)
+                        Entities[RemoveEntityEffect.EntityID].Effects.Remove(effect);
+                }
             }
         }
 
@@ -392,6 +402,7 @@ namespace MineLib.ClientWrapper
         {
             var ChunkData = (ChunkDataPacket) packet;
 
+            /*
             if (ChunkData.PrimaryBitMap == 0)
             {
                 // -- Unload chunk.
@@ -408,7 +419,7 @@ namespace MineLib.ClientWrapper
             }
 
             // -- Remove GZip Header
-            Array.Copy(ChunkData.Data, 2, ChunkData.Trim, 0, ChunkData.Trim.Length);
+            Buffer.BlockCopy(ChunkData.Data, 2, ChunkData.Trim, 0, ChunkData.Trim.Length);
 
             // -- Decompress the data
             byte[] decompressedData = Decompressor.Decompress(ChunkData.Trim);
@@ -416,8 +427,9 @@ namespace MineLib.ClientWrapper
             // -- Create new chunk
             var newChunk = new Chunk((int) ChunkData.Coordinates.X, (int) ChunkData.Coordinates.Z,
                 ChunkData.PrimaryBitMap, ChunkData.AddBitMap, true, ChunkData.GroundUpContinuous);
+
             // -- Skylight assumed true
-            newChunk.GetData(decompressedData);
+            //newChunk.GetData(decompressedData);
 
             if (World == null)
                 World = new World();
@@ -426,6 +438,7 @@ namespace MineLib.ClientWrapper
             World.WorldChunks.Add(newChunk);
 
             //mc.RaiseChunkLoad(X, Z);
+            */
         }
 
         private void OnMultiBlockChange(IPacket packet)
@@ -448,16 +461,16 @@ namespace MineLib.ClientWrapper
         {
             var MapChunkBulk = (MapChunkBulkPacket) packet;
 
-            var chunks = new Chunk[MapChunkBulk.ChunkColumnCount];
+            /*
+            Chunk[] chunks = new Chunk[MapChunkBulk.ChunkColumnCount];
 
-            Array.Copy(MapChunkBulk.ChunkData, 2, MapChunkBulk.Trim, 0, MapChunkBulk.Trim.Length);
+            Buffer.BlockCopy(MapChunkBulk.ChunkData, 2, MapChunkBulk.Trim, 0, MapChunkBulk.Trim.Length);
 
             byte[] DecompressedData = Decompressor.Decompress(MapChunkBulk.Trim);
 
             MapChunkBulkMetadata[] Data = MapChunkBulk.MetaInformation;
 
-            int i = 0;
-            foreach (MapChunkBulkMetadata d in MapChunkBulk.MetaInformation)
+            for (int i = 0; MapChunkBulk.ChunkColumnCount > i; i++)
             {
                 chunks[i] = new Chunk(Data[i].ChunkX, Data[i].ChunkZ, Data[i].PrimaryBitMap, Data[i].AddBitMap,
                     MapChunkBulk.SkyLightSent, true); // -- Assume true for Ground Up Continuous
@@ -469,8 +482,25 @@ namespace MineLib.ClientWrapper
                     World = new World();
 
                 World.WorldChunks.Add(chunks[i]);
-                i++;
             }
+
+
+            //int i = 0;
+            //foreach (MapChunkBulkMetadata d in MapChunkBulk.MetaInformation)
+            //{
+            //    chunks[i] = new Chunk(Data[i].ChunkX, Data[i].ChunkZ, Data[i].PrimaryBitMap, Data[i].AddBitMap,
+            //        MapChunkBulk.SkyLightSent, true); // -- Assume true for Ground Up Continuous
+            //
+            //    DecompressedData = chunks[i].GetData(DecompressedData);
+            //    // -- Calls the chunk class to take all of the bytes it needs, and return whats left.
+            //
+            //    if (World == null)
+            //        World = new World();
+            //
+            //    World.WorldChunks.Add(chunks[i]);
+            //    i++;
+            //}
+            */
         }
 
         private void OnExplosion(IPacket packet)
@@ -481,16 +511,14 @@ namespace MineLib.ClientWrapper
         {
             var Effect = (EffectPacket) packet;
 
-            PlayEffect(Effect.EffectID, Effect.X, (byte) Effect.Y,
-                Effect.Z, Effect.Data, Effect.DisableRelativeVolume);
+            PlayEffect(Effect.EffectID, Effect.Vector3, Effect.Data, Effect.DisableRelativeVolume);
         }
 
         private void OnSoundEffect(IPacket packet)
         {
             var SoundEffect = (SoundEffectPacket) packet;
 
-            PlaySound(SoundEffect.SoundName, SoundEffect.X, SoundEffect.Y,
-                SoundEffect.Z, SoundEffect.Volume, SoundEffect.Pitch);
+            PlaySound(SoundEffect.SoundName, SoundEffect.Vector3, SoundEffect.Volume, SoundEffect.Pitch);
         }
 
         private void OnParticle(IPacket packet)
@@ -567,7 +595,7 @@ namespace MineLib.ClientWrapper
         {
             var SignEditorOpen = (SignEditorOpenPacket) packet;
 
-            EditSign(SignEditorOpen.X, SignEditorOpen.Y, SignEditorOpen.Z);
+            EditSign(SignEditorOpen.Vector3);
         }
 
         private void OnStatistics(IPacket packet)
@@ -584,8 +612,8 @@ namespace MineLib.ClientWrapper
             var PlayerListItem = (PlayerListItemPacket) packet;
 
             // Maybe Clear PlayerList?
-            if (!PlayerList.ContainsKey(PlayerListItem.PlayerName))
-                PlayerList.Add(PlayerListItem.PlayerName, PlayerListItem.Ping);
+            if (!PlayersList.ContainsKey(PlayerListItem.PlayerName))
+                PlayersList.Add(PlayerListItem.PlayerName, PlayerListItem.Ping);
         }
 
         private void OnPlayerAbilities(IPacket packet)

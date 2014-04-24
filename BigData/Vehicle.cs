@@ -1,7 +1,7 @@
 ﻿namespace MineLib.ClientWrapper.BigData
 {
-    public class Vehile
+    public class Vehicle
     {
-        public int VehileID;
+        public int VehicleID;
     }
 }

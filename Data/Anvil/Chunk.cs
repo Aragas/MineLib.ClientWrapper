@@ -4,125 +4,129 @@ namespace MineLib.ClientWrapper.Data.Anvil
 {
     public class Chunk
     {
-        public int X, Z, BlocksCount, aBlocks;
-        public short PrimaryBitMap, AddBitMap;
-        public byte[] BlocksType;
-        public byte[] BlocksMetadata;
-        public byte[] BlocksLight;
-        public byte[] SkyLight;
+        public int X, Z, numBlocks, aBlocks;
+        public short pbitmap, abitmap;
+        public byte[] blocks;
+        public byte[] Metadata;
+        public byte[] Blocklight;
+        public byte[] Skylight;
         public byte[] AddArray;
         public byte[] BiomeArray;
 
-        public bool SkyLightSent, GroundUpContinuous;
-        public Section[] Sections;
+        public bool lighting, groundup = false;
+        public Section[] sections;
 
-        public Chunk(int x, int z, short primaryBitmap, short addBitmap, bool skyLightSent, bool groundUpContinuous)
+        public Chunk(int x, int z, short PBitmap, short ABitmap, bool Lighting, bool Groundup)
         {
             X = x;
             Z = z;
-            PrimaryBitMap = primaryBitmap;
-            AddBitMap = addBitmap;
-            SkyLightSent = skyLightSent;
-            GroundUpContinuous = groundUpContinuous;
+            pbitmap = PBitmap;
+            abitmap = ABitmap;
+            lighting = Lighting;
+            groundup = Groundup;
 
-            Sections = new Section[16];
+            sections = new Section[16];
 
-            BlocksCount = 0;
+            numBlocks = 0;
             aBlocks = 0;
 
             CreateSections();
         }
 
         /// <summary>
-        ///     Creates the chunk sections for this column based on the primary and add bitmasks.
+        /// Creates the chunk sections for this column based on the primary and add bitmasks.
         /// </summary>
-        private void CreateSections()
+        void CreateSections()
         {
             for (int i = 0; i < 16; i++)
             {
-                if ((PrimaryBitMap & (1 << i)) != 0)
+                if ((pbitmap & (1 << i)) != 0)
                 {
-                    BlocksCount++;
-                    Sections[i] = new Section((byte) i);
+                    numBlocks++;
+                    sections[i] = new Section((byte)i);
                 }
             }
 
             for (int i = 0; i < 16; i++)
             {
-                if ((AddBitMap & (1 << i)) != 0)
+                if ((abitmap & (1 << i)) != 0)
+                {
                     aBlocks++;
+                }
             }
 
             // -- Number of sections * Blocks per section = Blocks in this "Chunk"
-            BlocksCount = BlocksCount*4096;
+            numBlocks = numBlocks * 4096;
         }
 
         /// <summary>
-        ///     Populates the chunk sections contained in this chunk column with their information.
+        /// Populates the chunk sections contained in this chunk column with their information.
         /// </summary>
-        private void Populate()
+        void Populate()
         {
-            int offset = 0, current = 0, metaOff = 0, lightOff = 0, skyLightOff = 0;
+            int offset = 0, current = 0, metaOff = 0, Lightoff = 0, Skylightoff = 0;
 
             for (int i = 0; i < 16; i++)
             {
-                if ((PrimaryBitMap & (1 << i)) != 0)
+                if ((pbitmap & (1 << i)) != 0)
                 {
-                    var temp = new byte[4096];
-                    var temp2 = new byte[2048];
-                    var temp3 = new byte[2048];
-                    var temp4 = new byte[2048];
 
-                    Buffer.BlockCopy(BlocksType, offset, temp, 0, 4096); // -- Block IDs
-                    Buffer.BlockCopy(BlocksMetadata, metaOff, temp2, 0, 2048); // -- Metadata.
-                    Buffer.BlockCopy(BlocksLight, lightOff, temp3, 0, 2048); // -- Block lighting.
-                    Buffer.BlockCopy(SkyLight, skyLightOff, temp4, 0, 2048);
+                    byte[] temp = new byte[4096];
+                    byte[] temp2 = new byte[2048];
+                    byte[] temp3 = new byte[2048];
+                    byte[] temp4 = new byte[2048];
 
-                    // Strange. Some Sections can be null.
-                    Section mySection = Sections[current];
+                    Buffer.BlockCopy(blocks, offset, temp, 0, 4096); // -- Block IDs
+                    Buffer.BlockCopy(Metadata, metaOff, temp2, 0, 2048); // -- Metadata.
+                    Buffer.BlockCopy(Blocklight, Lightoff, temp3, 0, 2048); // -- Block lighting.
+                    Buffer.BlockCopy(Skylight, Skylightoff, temp4, 0, 2048);
 
-                    mySection.BlocksType = temp;
-                    mySection.BlocksMetadata = CreateMetadataBytes(temp2);
-                    mySection.BlocksLight = CreateMetadataBytes(temp3);
-                    mySection.SkyLight = CreateMetadataBytes(temp4);
+                    Section mySection = sections[current];
+                    if (mySection == null)
+                        continue;
+
+                    mySection.Blocks = temp;
+                    mySection.Metadata = CreateMetadataBytes(temp2);
+                    mySection.BlockLight = CreateMetadataBytes(temp3);
+                    mySection.Skylight = CreateMetadataBytes(temp4);
 
                     offset += 4096;
                     metaOff += 2048;
-                    lightOff += 2048;
-                    skyLightOff += 2048;
+                    Lightoff += 2048;
+                    Skylightoff += 2048;
 
                     current += 1;
                 }
             }
 
             // -- Free the memory, everything is now stored in sections.
-            BlocksType = null;
-            BlocksMetadata = null;
+            blocks = null;
+            Metadata = null;
         }
 
         /// <summary>
-        ///     Expand the compressed Metadata (half-byte per block) into single-byte per block for easier reading.
+        /// Expand the compressed Metadata (half-byte per block) into single-byte per block for easier reading.
         /// </summary>
         /// <param name="oldMeta">Old (2048-byte) Metadata</param>
         /// <returns>4096 uncompressed Metadata</returns>
         public byte[] CreateMetadataBytes(byte[] oldMeta)
         {
-            var newMeta = new byte[4096];
+            byte[] newMeta = new byte[4096];
 
             for (int i = 0; i < oldMeta.Length; i++)
             {
-                var block2 = (byte) ((oldMeta[i] >> 4) & 15);
-                var block1 = (byte) (oldMeta[i] & 15);
+                byte block2 = (byte)((oldMeta[i] >> 4) & 15);
+                byte block1 = (byte)(oldMeta[i] & 15);
 
-                newMeta[(i*2)] = block1;
-                newMeta[(i*2) + 1] = block2;
+                newMeta[(i * 2)] = block1;
+                newMeta[(i * 2) + 1] = block2;
             }
 
             return newMeta;
         }
 
         /// <summary>
-        ///     Takes this chunk's portion of data from a byte array.
+        /// Takes this chunk's portion of data from a byte array.
         /// </summary>
         /// <param name="deCompressed">The byte array containing this chunk's data at the front.</param>
         /// <returns>The byte array with this chunk's bytes removed.</returns>
@@ -134,37 +138,37 @@ namespace MineLib.ClientWrapper.Data.Anvil
             byte[] temp;
             int offset = 0;
 
-            BlocksType = new byte[BlocksCount];
-            BlocksMetadata = new byte[BlocksCount/2]; // -- Contains block Metadata.
-            BlocksLight = new byte[BlocksCount/2];
+            blocks = new byte[numBlocks];
+            Metadata = new byte[numBlocks / 2]; // -- Contains block Metadata.
+            Blocklight = new byte[numBlocks / 2];
 
-            if (SkyLightSent)
-                SkyLight = new byte[BlocksCount/2];
+            if (lighting)
+                Skylight = new byte[numBlocks / 2];
 
-            AddArray = new byte[BlocksCount/2];
+            AddArray = new byte[numBlocks / 2];
 
-            if (GroundUpContinuous)
+            if (groundup)
                 BiomeArray = new byte[256];
 
-            Buffer.BlockCopy(deCompressed, 0, BlocksType, 0, BlocksCount);
-            offset += BlocksCount;
+            Buffer.BlockCopy(deCompressed, 0, blocks, 0, numBlocks);
+            offset += numBlocks;
 
-            Buffer.BlockCopy(deCompressed, offset, BlocksMetadata, 0, BlocksCount/2); // -- Copy in Metadata
-            offset += BlocksCount/2;
+            Buffer.BlockCopy(deCompressed, offset, Metadata, 0, numBlocks / 2); // -- Copy in Metadata
+            offset += numBlocks / 2;
 
-            Buffer.BlockCopy(deCompressed, offset, BlocksLight, 0, BlocksCount/2);
-            offset += BlocksCount/2;
+            Buffer.BlockCopy(deCompressed, offset, Blocklight, 0, numBlocks / 2);
+            offset += numBlocks / 2;
 
-            if (SkyLightSent)
+            if (lighting)
             {
-                Buffer.BlockCopy(deCompressed, offset, SkyLight, 0, BlocksCount/2);
-                offset += BlocksCount/2;
+                Buffer.BlockCopy(deCompressed, offset, Skylight, 0, numBlocks / 2);
+                offset += numBlocks / 2;
             }
 
-            Buffer.BlockCopy(deCompressed, offset, AddArray, 0, aBlocks/2);
-            offset += aBlocks/2;
+            Buffer.BlockCopy(deCompressed, offset, AddArray, 0, aBlocks / 2);
+            offset += aBlocks / 2;
 
-            if (GroundUpContinuous)
+            if (groundup)
             {
                 Buffer.BlockCopy(deCompressed, offset, BiomeArray, 0, 256);
                 offset += 256;
@@ -193,6 +197,7 @@ namespace MineLib.ClientWrapper.Data.Anvil
 
             Section thisSection = GetSectionByNumber(By);
             thisSection.SetBlock(GetXinSection(Bx), GetPositionInSection(By), GetZinSection(Bz), id);
+
         }
 
         public int GetBlockId(int Bx, int By, int Bz)
@@ -222,63 +227,58 @@ namespace MineLib.ClientWrapper.Data.Anvil
 
         public byte GetBlockLight(int x, int y, int z)
         {
-            Section thisSection = GetSectionByNumber(y);
+            var thisSection = GetSectionByNumber(y);
             return thisSection.GetBlockLighting(GetXinSection(x), GetPositionInSection(y), GetZinSection(z));
         }
 
         public void SetBlockLight(int x, int y, int z, byte light)
         {
-            Section thisSection = GetSectionByNumber(y);
+            var thisSection = GetSectionByNumber(y);
             thisSection.SetBlockLighting(GetXinSection(x), GetPositionInSection(y), GetZinSection(z), light);
         }
 
         public byte GetBlockSkylight(int x, int y, int z)
         {
-            Section thisSection = GetSectionByNumber(y);
+            var thisSection = GetSectionByNumber(y);
             return thisSection.GetBlockSkylight(GetXinSection(x), GetPositionInSection(y), GetZinSection(z));
         }
 
         public void SetBlockSkylight(int x, int y, int z, byte light)
         {
-            Section thisSection = GetSectionByNumber(y);
+            var thisSection = GetSectionByNumber(y);
             thisSection.SetBlockSkylight(GetXinSection(x), GetPositionInSection(y), GetZinSection(z), light);
         }
 
         public byte GetBlockBiome(int x, int z)
         {
-            return BiomeArray[(z*16) + x];
+            return BiomeArray[(z * 16) + x];
         }
 
         public void SetBlockBiome(int x, int z, byte biome)
         {
-            BiomeArray[(z*16) + x] = biome;
+            BiomeArray[(z * 16) + x] = biome;
         }
 
         #region Helping Methods
-
         private Section GetSectionByNumber(int blockY)
         {
-            return Sections[(byte) (blockY/16)];
+            return sections[(byte)(blockY / 16)];
         }
-
         private int GetXinSection(int BlockX)
         {
-            return Math.Abs(BlockX - (X*16));
+            return Math.Abs(BlockX - (X * 16));
         }
-
         private int GetPositionInSection(int blockY)
         {
-            return blockY%16; // Credits: SirCmpwn Craft.net
+            return blockY % 16; // Credits: SirCmpwn Craft.net
         }
-
         private int GetZinSection(int BlockZ)
         {
             if (Z == 0)
                 return BlockZ;
 
-            return BlockZ%Z;
+            return BlockZ % Z;
         }
-
         #endregion
     }
 }

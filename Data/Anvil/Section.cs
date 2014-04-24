@@ -4,72 +4,71 @@ namespace MineLib.ClientWrapper.Data.Anvil
 {
     public class Section
     {
-        public byte[] BlocksType;
-        public byte[] BlocksMetadata;
-        public byte[] BlocksLight;
-        public byte[] SkyLight;
-        public byte Y;
+        public byte[] Blocks;
+        public byte[] Metadata;
+        public byte[] BlockLight;
+        public byte[] Skylight;
+        public byte y;
 
-        public Section(byte y)
+        public Section(byte Y)
         {
-            Y = y;
-            BlocksType = new byte[4096];
-            BlocksMetadata = new byte[4096];
-            BlocksLight = new byte[4096];
-            SkyLight = new byte[4096];
+            y = Y;
+            Blocks = new byte[4096];
+            Metadata = new byte[4096];
+            BlockLight = new byte[4096];
+            Skylight = new byte[4096];
         }
 
         public void SetBlock(int x, int y, int z, int id)
         {
-            int index = x + (z*16) + (y*16*16);
-            BlocksType[index] = (byte) id;
+            int index = x + (z * 16) + (y * 16 * 16);
+            Blocks[index] = (byte)id;
         }
 
         public Block GetBlock(int x, int y, int z)
         {
-            int index = x + (z*16) + (y*16*16);
-            var thisBlock = new Block(BlocksType[index], x, y, z, (int) Math.Floor(decimal.Divide(x, 16)),
-                (int) Math.Floor(decimal.Divide(z, 16)));
+            int index = x + (z * 16) + (y * 16 * 16);
+            var thisBlock = new Block((int)Blocks[index], x, y, z, (int)Math.Floor(decimal.Divide(x, 16)), (int)Math.Floor(decimal.Divide(z, 16)));
 
             return thisBlock;
         }
 
         public int GetBlockMetadata(int x, int y, int z)
         {
-            int index = (x + (z*16) + (y*16*16));
-            byte value = BlocksMetadata[index];
+            int index = (x + (z * 16) + (y * 16 * 16));
+            byte value = Metadata[index];
 
             return value;
         }
 
         public void SetBlockMetadata(int x, int y, int z, byte data)
         {
-            int index = (x + (z*16) + (y*16*16));
-            BlocksMetadata[index] = data;
+            int index = (x + (z * 16) + (y * 16 * 16));
+            Metadata[index] = data;
         }
 
         public byte GetBlockLighting(int x, int y, int z)
         {
-            int index = (x + (z*16) + (y*16*16));
-            return BlocksLight[index];
+            int index = (x + (z * 16) + (y * 16 * 16));
+            return BlockLight[index];
         }
 
         public void SetBlockLighting(int x, int y, int z, byte data)
         {
-            int index = (x + (z*16) + (y*16*16));
-            BlocksLight[index] = data;
+            int index = (x + (z * 16) + (y * 16 * 16));
+            BlockLight[index] = data;
         }
 
         public byte GetBlockSkylight(int x, int y, int z)
         {
-            int index = (x + (z*16) + (y*16*16));
-            return SkyLight[index];
+            int index = (x + (z * 16) + (y * 16 * 16));
+            return Skylight[index];
         }
 
         public void SetBlockSkylight(int x, int y, int z, byte data)
         {
-            int index = (x + (z*16) + (y*16*16));
-            SkyLight[index] = data;
+            int index = (x + (z * 16) + (y * 16 * 16));
+            Skylight[index] = data;
         }
     }
 }

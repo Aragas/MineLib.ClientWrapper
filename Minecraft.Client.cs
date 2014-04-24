@@ -1,5 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using MineLib.Network.Data;
+using MineLib.Network.Enums;
 using Newtonsoft.Json;
 
 // Use http://json2csharp.com/
@@ -7,8 +8,6 @@ namespace MineLib.ClientWrapper
 {
     public partial class Minecraft
     {
-        public List<ChatMessage> ChatMessage1 = new List<ChatMessage>(); 
-
         public struct Extra
         {
             [JsonProperty("color")]
@@ -77,13 +76,15 @@ namespace MineLib.ClientWrapper
 
         }
 
+        public List<ChatMessage> ChatMessageHistory = new List<ChatMessage>(); 
 
-        private void PlaySound(string SoundName, int X, int Y, int Z,
+
+        private void PlaySound(string SoundName, Vector3 vector3,
             float Volume, byte Pitch)
         {
         }
 
-        private void PlayEffect(int EffectID, int X, byte Y, int Z,
+        private void PlayEffect(EffectID EffectID, Vector3 vector3,
             int Data, bool DisableRelativeVolume)
         {
         }
@@ -92,10 +93,10 @@ namespace MineLib.ClientWrapper
         {
            var Text = JsonConvert.DeserializeObject<ChatMessage>(message);
 
-            ChatMessage1.Add(Text);
+            ChatMessageHistory.Add(Text);
         }
 
-        private void EditSign(int x, int y, int z)
+        private void EditSign(Vector3 vector3)
         {
         }
     }

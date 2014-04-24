@@ -1,6 +1,4 @@
-﻿using MineLib.Network.Enums;
-
-namespace MineLib.ClientWrapper.Data.Anvil
+﻿namespace MineLib.ClientWrapper.Data.Anvil
 {
     public class Block
     {
@@ -21,7 +19,6 @@ namespace MineLib.ClientWrapper.Data.Anvil
             ChunkX = chunkX;
             ChunkZ = chunkZ;
 
-            Name = ((Blocks) ID).ToString();
         }
     }
 }

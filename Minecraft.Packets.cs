@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MineLib.Network.Enums;
 using MineLib.Network.Packets;
 
@@ -6,13 +7,17 @@ namespace MineLib.ClientWrapper
 {
     public partial class Minecraft
     {
+        // -- Debugging
         List<IPacket> packets = new List<IPacket>();
-        public bool Ready;
+        // -- Debugging
 
         private void RaisePacketHandled(IPacket packet, int id, ServerState state)
         {
+            // -- Debugging
+            Console.WriteLine("ID: 0x" + String.Format("{0:X}", id));
+            Console.WriteLine(" ");
+            // -- Debugging
             packets.Add(packet);
-            Ready = true;
 
             switch (state)
             {
@@ -26,8 +31,7 @@ namespace MineLib.ClientWrapper
                             // Stop.
                             break;
 
-                        case PacketsServer.EncryptionRequest:
-                            Handler.EnableEncryption(packet);
+                        case PacketsServer.EncryptionRequest: // -- NetworkHandler do all stuff automatic
                             break;
 
                         case PacketsServer.LoginSuccess:
@@ -310,23 +314,7 @@ namespace MineLib.ClientWrapper
 
                     break;
 
-                case ServerState.Status:
-
-                    #region Status
-
-                    switch ((PacketsServer) id)
-                    {
-                        case PacketsServer.Response:
-                            //State = ServerState.Play;
-                            break;
-
-                        case PacketsServer.Ping:
-                            //State = ServerState.Play;
-                            break;
-                    }
-
-                    #endregion Status
-
+                case ServerState.Status: // -- We don't use that normally.
                     break;
 
                 default:

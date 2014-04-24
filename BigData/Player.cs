@@ -1,24 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MineLib.Network.Data;
 using MineLib.Network.Enums;
 using MineLib.Network.Packets.Client;
 
 namespace MineLib.ClientWrapper.BigData
 {
-    public class ThisPlayer
+    public class Player
     {
-        public ThisPlayer()
+        public Player()
         {
-            Effects = new Dictionary<int, PlayerEffect>();
+            Effects = new List<PlayerEffect>();
             Windows = new List<PlayerWindow>();
-        }
-
-        public PlayerPacket Packet()
-        {
-            // Update status about Effects here
-            // Update all valuer here.. i think..
-
-            return new PlayerPacket {OnGround = Position.OnGround};
         }
 
         public int EntityID;
@@ -30,14 +23,14 @@ namespace MineLib.ClientWrapper.BigData
 
         public PlayerHealth Health; //
         public PlayerItems Items; //
-        public PlayerHeldItem HeldItem; //
+        public byte HeldItem; // //Slot
         public PlayerExperience Experience; //
-        public PlayerAnimation Animation;
+        public Animation Animation;
 
         ///
         public PlayerStatistics Statistics;
 
-        public Dictionary<int, PlayerEffect> Effects;
+        public List<PlayerEffect> Effects;
         public List<PlayerWindow> Windows;
         public PlayerScoreboardObjective ScoreboardObjective;
 
@@ -78,20 +71,27 @@ namespace MineLib.ClientWrapper.BigData
 
     public struct PlayerNewPosition
     {
-        public double X, Y, Z;
-        public float Yaw, Pitch;
+        public Vector3 Vector3;
+        public float Yaw;
+        public float Pitch;
         public bool OnGround;
     }
 
     public struct PlayerAbilities
     {
-        public PlayerAbility Flags;
-        public float FlyingSpeed, WalkingSpeed;
+        public byte Flags;
+        public bool DamageDisabled { get { return Convert.ToBoolean((Flags >> 3) & 1); } }
+        public bool CanFly { get { return Convert.ToBoolean((Flags >> 2) & 1); } }
+        public bool IsFlying { get { return Convert.ToBoolean((Flags >> 1) & 1); } }
+        public bool CreativeMode { get { return Convert.ToBoolean((Flags >> 0) & 1); } }
+        public float FlyingSpeed;
+        public float WalkingSpeed;
     }
 
     public struct PlayerLook
     {
-        public float Yaw, Pitch;
+        public float Yaw;
+        public float Pitch;
     }
 
     public struct PlayerHealth
@@ -107,21 +107,11 @@ namespace MineLib.ClientWrapper.BigData
         public ItemStack[] SlotData;
     }
 
-    public struct PlayerHeldItem
-    {
-        public byte Slot;
-    }
-
     public struct PlayerExperience
     {
         public float ExperienceBar;
         public short Level;
         public short TotalExperience;
-    }
-
-    public struct PlayerAnimation
-    {
-        public Animation Animation;
     }
 
     public struct PlayerStatistics
@@ -133,13 +123,14 @@ namespace MineLib.ClientWrapper.BigData
 
     public struct PlayerEffect
     {
-        public byte EffectID;
+        public EffectID EffectID;
         public byte Amplifier;
         public short Duration;
     }
 
     public struct PlayerWindow
     {
+
     }
 
     public struct PlayerScoreboardObjective

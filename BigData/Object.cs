@@ -1,6 +1,7 @@
 ﻿namespace MineLib.ClientWrapper.BigData
 {
-    class Object
+    public class Object
     {
+
     }
 }

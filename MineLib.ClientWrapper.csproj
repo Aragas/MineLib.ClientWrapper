@@ -70,15 +70,18 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Network\Libraries\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BigData\Entity.cs" />
     <Compile Include="BigData\Object.cs" />
-    <Compile Include="BigData\ThisPlayer.cs" />
-    <Compile Include="BigData\Vehile.cs" />
+    <Compile Include="BigData\Player.cs" />
+    <Compile Include="BigData\Vehicle.cs" />
     <Compile Include="BigData\World.cs" />
     <Compile Include="Data\Anvil\Block.cs" />
     <Compile Include="Data\Anvil\Chunk.cs" />
@@ -88,16 +91,15 @@
     <Compile Include="Minecraft.cs" />
     <Compile Include="Minecraft.Events.cs" />
     <Compile Include="Minecraft.Packets.cs" />
+    <Compile Include="Minecraft.Yggdrasil.cs" />
+    <Compile Include="PlayerHandler.cs" />
     <Compile Include="TestClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Network\MineLib.Network.csproj">
       <Project>{e7c8320e-49a4-4187-afe3-15c814201e1e}</Project>
       <Name>MineLib.Network</Name>
-    </ProjectReference>
-    <ProjectReference Include="Network\Newtonsoft.Json\Src\Newtonsoft.Json\Newtonsoft.Json.Net20.csproj">
-      <Project>{a9ae40ff-1a21-414a-9fe7-3be13644cc6d}</Project>
-      <Name>Newtonsoft.Json.Net20</Name>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
