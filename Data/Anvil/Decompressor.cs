@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Compression;
 
 namespace MineLib.ClientWrapper.Data.Anvil
@@ -8,7 +9,10 @@ namespace MineLib.ClientWrapper.Data.Anvil
         // ZLib Decompressor.
         public static byte[] Decompress(byte[] data)
         {
-            using (var compressedStream = new MemoryStream(data))
+            var trim = new byte[data.Length - 2];
+            Buffer.BlockCopy(data, 2, trim, 0, trim.Length);
+
+            using (var compressedStream = new MemoryStream(trim))
             using (var zipStream = new DeflateStream(compressedStream, CompressionMode.Decompress))
             using (var resultStream = new MemoryStream())
             {

@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using MineLib.ClientWrapper.BigData;
+using MineLib.ClientWrapper.Data.Anvil;
+using MineLib.Network.Data;
 using MineLib.Network.Events;
 using MineLib.Network.Packets;
 using MineLib.Network.Packets.Server;
@@ -11,6 +14,7 @@ namespace MineLib.ClientWrapper
     {
         // -- Debugging
         public List<string> ChatHistory = new List<string>();
+        public List<IPacket> MapError = new List<IPacket>();
         // -- Debugging
 
         public event PacketsHandler FirePacketHandled;
@@ -69,7 +73,7 @@ namespace MineLib.ClientWrapper
         {
             var SpawnPosition = (SpawnPositionPacket) packet;
 
-            World.SpawnPosition = SpawnPosition.Vector3;
+            World.SpawnPosition = SpawnPosition.Coordinates;
         }
 
         private void OnUpdateHealth(IPacket packet)
@@ -146,7 +150,7 @@ namespace MineLib.ClientWrapper
             if (!Entities.ContainsKey(UseBed.EntityID))
                 Entities.Add(UseBed.EntityID, new Entity {EntityID = UseBed.EntityID});
 
-            Entities[UseBed.EntityID].Bed = UseBed.Vector3;
+            Entities[UseBed.EntityID].Bed = UseBed.Coordinates;
         }
 
         private void OnAnimation(IPacket packet)
@@ -402,43 +406,49 @@ namespace MineLib.ClientWrapper
         {
             var ChunkData = (ChunkDataPacket) packet;
 
-            /*
+            
             if (ChunkData.PrimaryBitMap == 0)
             {
                 // -- Unload chunk.
                 int cIndex = -1;
 
                 if (World != null)
-                    cIndex = World.GetChunkIndex((int) ChunkData.Coordinates.X, (int) ChunkData.Coordinates.Z);
+                    cIndex = World.GetChunkIndex(ChunkData.Coordinates);
 
                 if (cIndex != -1)
-                    World.WorldChunks.RemoveAt(cIndex);
+                    World.Chunks.RemoveAt(cIndex);
 
                 //mc.RaiseChunkUnload(X, Z);
                 return;
             }
 
             // -- Remove GZip Header
-            Buffer.BlockCopy(ChunkData.Data, 2, ChunkData.Trim, 0, ChunkData.Trim.Length);
+            //Buffer.BlockCopy(ChunkData.Data, 2, ChunkData.Trim, 0, ChunkData.Trim.Length);
 
             // -- Decompress the data
             byte[] decompressedData = Decompressor.Decompress(ChunkData.Trim);
 
             // -- Create new chunk
-            var newChunk = new Chunk((int) ChunkData.Coordinates.X, (int) ChunkData.Coordinates.Z,
-                ChunkData.PrimaryBitMap, ChunkData.AddBitMap, true, ChunkData.GroundUpContinuous);
+            var newChunk = new NewChunk
+            {
+                Coordinates = ChunkData.Coordinates,
+                PrimaryBitMap = ChunkData.PrimaryBitMap,
+                AddBitMap = ChunkData.AddBitMap,
+                SkyLightSent = ChunkData.SkyLightSend,
+                GroundUp = ChunkData.GroundUp
+            };
 
             // -- Skylight assumed true
-            //newChunk.GetData(decompressedData);
+            newChunk.ReadChunkData(decompressedData);
 
             if (World == null)
                 World = new World();
 
             // -- Add the chunk to the world
-            World.WorldChunks.Add(newChunk);
+            World.Chunks.Add(newChunk);
 
             //mc.RaiseChunkLoad(X, Z);
-            */
+            
         }
 
         private void OnMultiBlockChange(IPacket packet)
@@ -447,6 +457,8 @@ namespace MineLib.ClientWrapper
 
         private void OnBlockChange(IPacket packet)
         {
+            var BlockChange = (BlockChangePacket) packet;
+
         }
 
         private void OnBlockAction(IPacket packet)
@@ -461,46 +473,34 @@ namespace MineLib.ClientWrapper
         {
             var MapChunkBulk = (MapChunkBulkPacket) packet;
 
-            /*
-            Chunk[] chunks = new Chunk[MapChunkBulk.ChunkColumnCount];
+            var chunks = new NewChunk[MapChunkBulk.ChunkColumnCount];
 
-            Buffer.BlockCopy(MapChunkBulk.ChunkData, 2, MapChunkBulk.Trim, 0, MapChunkBulk.Trim.Length);
+            var DecompressedData = Decompressor.Decompress(MapChunkBulk.ChunkData);
 
-            byte[] DecompressedData = Decompressor.Decompress(MapChunkBulk.Trim);
+            if (World == null)
+                World = new World();
 
-            MapChunkBulkMetadata[] Data = MapChunkBulk.MetaInformation;
-
-            for (int i = 0; MapChunkBulk.ChunkColumnCount > i; i++)
+            var i = 0;
+            foreach (var metadata in MapChunkBulk.MetaInformation)
             {
-                chunks[i] = new Chunk(Data[i].ChunkX, Data[i].ChunkZ, Data[i].PrimaryBitMap, Data[i].AddBitMap,
-                    MapChunkBulk.SkyLightSent, true); // -- Assume true for Ground Up Continuous
+                chunks[i] = new NewChunk();
+                chunks[i].Coordinates = metadata.Coordinates;
+                if (metadata.Coordinates.Z > 1000)
+                {
+                    MapError.Add(MapChunkBulk);
+                    return;
+                }
+                chunks[i].PrimaryBitMap = metadata.PrimaryBitMap;
+                chunks[i].AddBitMap = metadata.AddBitMap;
+                chunks[i].SkyLightSent = metadata.SkyLightSend;
+                chunks[i].GroundUp = metadata.GroundUp;
 
-                DecompressedData = chunks[i].GetData(DecompressedData);
+                DecompressedData = chunks[i].ReadChunkData(DecompressedData);
                 // -- Calls the chunk class to take all of the bytes it needs, and return whats left.
 
-                if (World == null)
-                    World = new World();
-
-                World.WorldChunks.Add(chunks[i]);
+                World.Chunks.Add(chunks[i]);
+                i++;
             }
-
-
-            //int i = 0;
-            //foreach (MapChunkBulkMetadata d in MapChunkBulk.MetaInformation)
-            //{
-            //    chunks[i] = new Chunk(Data[i].ChunkX, Data[i].ChunkZ, Data[i].PrimaryBitMap, Data[i].AddBitMap,
-            //        MapChunkBulk.SkyLightSent, true); // -- Assume true for Ground Up Continuous
-            //
-            //    DecompressedData = chunks[i].GetData(DecompressedData);
-            //    // -- Calls the chunk class to take all of the bytes it needs, and return whats left.
-            //
-            //    if (World == null)
-            //        World = new World();
-            //
-            //    World.WorldChunks.Add(chunks[i]);
-            //    i++;
-            //}
-            */
         }
 
         private void OnExplosion(IPacket packet)
@@ -511,14 +511,14 @@ namespace MineLib.ClientWrapper
         {
             var Effect = (EffectPacket) packet;
 
-            PlayEffect(Effect.EffectID, Effect.Vector3, Effect.Data, Effect.DisableRelativeVolume);
+            PlayEffect(Effect.EffectID, Effect.Coordinates, Effect.Data, Effect.DisableRelativeVolume);
         }
 
         private void OnSoundEffect(IPacket packet)
         {
             var SoundEffect = (SoundEffectPacket) packet;
 
-            PlaySound(SoundEffect.SoundName, SoundEffect.Vector3, SoundEffect.Volume, SoundEffect.Pitch);
+            PlaySound(SoundEffect.SoundName, SoundEffect.Coordinates, SoundEffect.Volume, SoundEffect.Pitch);
         }
 
         private void OnParticle(IPacket packet)
@@ -595,7 +595,7 @@ namespace MineLib.ClientWrapper
         {
             var SignEditorOpen = (SignEditorOpenPacket) packet;
 
-            EditSign(SignEditorOpen.Vector3);
+            EditSign(SignEditorOpen.Coordinates);
         }
 
         private void OnStatistics(IPacket packet)

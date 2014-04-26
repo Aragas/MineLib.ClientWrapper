@@ -16,6 +16,7 @@ namespace MineLib.ClientWrapper.Data.Anvil
         public bool lighting, groundup = false;
         public Section[] sections;
 
+
         public Chunk(int x, int z, short PBitmap, short ABitmap, bool Lighting, bool Groundup)
         {
             X = x;
@@ -26,12 +27,16 @@ namespace MineLib.ClientWrapper.Data.Anvil
             groundup = Groundup;
 
             sections = new Section[16];
+            for (int i = 0; i < sections.Length; i++)
+                sections[i] = new Section((byte)i);
+
 
             numBlocks = 0;
             aBlocks = 0;
 
             CreateSections();
         }
+
 
         /// <summary>
         /// Creates the chunk sections for this column based on the primary and add bitmasks.
@@ -150,7 +155,7 @@ namespace MineLib.ClientWrapper.Data.Anvil
             if (groundup)
                 BiomeArray = new byte[256];
 
-            Buffer.BlockCopy(deCompressed, 0, blocks, 0, numBlocks);
+            Buffer.BlockCopy(deCompressed, offset, blocks, 0, numBlocks);
             offset += numBlocks;
 
             Buffer.BlockCopy(deCompressed, offset, Metadata, 0, numBlocks / 2); // -- Copy in Metadata

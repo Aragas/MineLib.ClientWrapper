@@ -4,15 +4,17 @@ namespace MineLib.ClientWrapper.Data.Anvil
 {
     public class Section
     {
+        public const byte Width = 16, Height = 16, Depth = 16;
+
         public byte[] Blocks;
         public byte[] Metadata;
         public byte[] BlockLight;
         public byte[] Skylight;
-        public byte y;
+        public byte Y;
 
-        public Section(byte Y)
+        public Section(byte y)
         {
-            y = Y;
+            Y = y;
             Blocks = new byte[4096];
             Metadata = new byte[4096];
             BlockLight = new byte[4096];
