@@ -45,7 +45,9 @@ namespace MineLib.ClientWrapper
         {
             var ChatMessage = (ChatMessagePacket) packet;
 
+            // -- Debugging
             ChatHistory.Add(ChatMessage.Message);
+            // -- Debugging
 
             DisplayChatMessage(ChatMessage.Message);
         }
@@ -406,27 +408,21 @@ namespace MineLib.ClientWrapper
         {
             var ChunkData = (ChunkDataPacket) packet;
 
-            
+            if (World == null)
+                World = new World();
+
             if (ChunkData.PrimaryBitMap == 0)
             {
-                // -- Unload chunk.
-                int cIndex = -1;
-
-                if (World != null)
-                    cIndex = World.GetChunkIndex(ChunkData.Coordinates);
+                var cIndex = World.GetChunkIndex(ChunkData.Coordinates);
 
                 if (cIndex != -1)
                     World.Chunks.RemoveAt(cIndex);
 
-                //mc.RaiseChunkUnload(X, Z);
                 return;
             }
 
-            // -- Remove GZip Header
-            //Buffer.BlockCopy(ChunkData.Data, 2, ChunkData.Trim, 0, ChunkData.Trim.Length);
-
             // -- Decompress the data
-            byte[] decompressedData = Decompressor.Decompress(ChunkData.Trim);
+            byte[] decompressedData = Decompressor.Decompress(ChunkData.Data);
 
             // -- Create new chunk
             var newChunk = new NewChunk
@@ -438,17 +434,10 @@ namespace MineLib.ClientWrapper
                 GroundUp = ChunkData.GroundUp
             };
 
-            // -- Skylight assumed true
             newChunk.ReadChunkData(decompressedData);
 
-            if (World == null)
-                World = new World();
-
             // -- Add the chunk to the world
-            World.Chunks.Add(newChunk);
-
-            //mc.RaiseChunkLoad(X, Z);
-            
+            World.Chunks.Add(newChunk);     
         }
 
         private void OnMultiBlockChange(IPacket packet)
@@ -485,7 +474,7 @@ namespace MineLib.ClientWrapper
             {
                 chunks[i] = new NewChunk();
                 chunks[i].Coordinates = metadata.Coordinates;
-                if (metadata.Coordinates.Z > 1000)
+                if (metadata.Coordinates.Z > 1000) // bug
                 {
                     MapError.Add(MapChunkBulk);
                     return;

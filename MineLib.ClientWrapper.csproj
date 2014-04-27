@@ -95,6 +95,7 @@
     <Compile Include="Data\Anvil\Decompressor.cs" />
     <Compile Include="Data\Anvil\NewChunk.cs" />
     <Compile Include="Data\Anvil\Section.cs" />
+    <Compile Include="Minecraft.Classic.cs" />
     <Compile Include="Minecraft.Client.cs" />
     <Compile Include="Minecraft.cs" />
     <Compile Include="Minecraft.Events.cs" />

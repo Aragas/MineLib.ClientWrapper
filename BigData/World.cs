@@ -11,7 +11,7 @@ namespace MineLib.ClientWrapper.BigData
         public Dimension Dimension;
         public Difficulty Difficulty;
         public GameStateChanged StateChanged;
-        public Vector3 SpawnPosition;
+        public Coordinates3D SpawnPosition;
 
         public byte MaxPlayers;
 

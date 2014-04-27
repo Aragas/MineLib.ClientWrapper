@@ -5,6 +5,7 @@ using MineLib.Network.Packets.Client;
 
 namespace MineLib.ClientWrapper
 {
+    // Not used
     public class PlayerHandler
     {
         private Player _player;

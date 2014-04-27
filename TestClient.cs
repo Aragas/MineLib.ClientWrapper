@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Text;
-using System.Threading;
-using System.Windows.Forms;
-using MineLib.ClientWrapper.Data.Anvil;
 using MineLib.Network.BaseClients;
 using MineLib.Network.Enums;
 using MineLib.Network.Packets;
@@ -15,12 +12,9 @@ namespace MineLib.ClientWrapper
     {
         public static Minecraft Client;
         private static ResponseData ServerData;
-        public static Chunk[,,] hh = new Chunk[10,10,10];
 
         public static void Main(string[] args)
         {
-
-
             string ServerIP = "127.0.0.1";  //args[0];                 // localhost
             short ServerPort = 25565;       //short.Parse(args[1]);    // 25565
 

@@ -11,13 +11,13 @@ namespace MineLib.ClientWrapper
         List<IPacket> packets = new List<IPacket>();
         // -- Debugging
 
-        private void RaisePacketHandled(IPacket packet, int id, ServerState state)
+        private void RaisePacketHandled(IPacket packet, int id, ServerState? state)
         {
             // -- Debugging
             Console.WriteLine("ID: 0x" + String.Format("{0:X}", id));
             Console.WriteLine(" ");
-            // -- Debugging
             packets.Add(packet);
+            // -- Debugging
 
             switch (state)
             {
@@ -323,5 +323,6 @@ namespace MineLib.ClientWrapper
                     break;
             }
         }
+
     }
 }

@@ -79,12 +79,12 @@ namespace MineLib.ClientWrapper
         public List<ChatMessage> ChatMessageHistory = new List<ChatMessage>(); 
 
 
-        private void PlaySound(string SoundName, Vector3 vector3,
+        private void PlaySound(string SoundName, Coordinates3D vector3,
             float Volume, byte Pitch)
         {
         }
 
-        private void PlayEffect(EffectID EffectID, Vector3 vector3,
+        private void PlayEffect(EffectID EffectID, Coordinates3D vector3,
             int Data, bool DisableRelativeVolume)
         {
         }
@@ -96,7 +96,7 @@ namespace MineLib.ClientWrapper
             ChatMessageHistory.Add(Text);
         }
 
-        private void EditSign(Vector3 vector3)
+        private void EditSign(Coordinates3D vector3)
         {
         }
     }

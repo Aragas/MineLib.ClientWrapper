@@ -102,10 +102,11 @@ namespace MineLib.ClientWrapper
             PlayersList = new Dictionary<string, short>();
 
             Handler = new NetworkHandler(this);
-            PlayerHandler = new PlayerHandler(ref Handler, ref Player);
+            //PlayerHandler = new PlayerHandler(ref Handler, ref Player);
 
             // -- Register our event handlers.
             Handler.OnPacketHandled += RaisePacketHandled;
+            Handler.OnPacketHandledClassic += RaisePacketHandledClassic;
 
             // -- Connect to the server and begin reading packets.
             Handler.Start();

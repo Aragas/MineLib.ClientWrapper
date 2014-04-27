@@ -27,7 +27,7 @@ namespace MineLib.ClientWrapper.BigData
         public Vector3 Position;
         public EntityLook Look;
         public List<EntityEffect> Effects;
-        public Vector3 Bed;
+        public Coordinates3D Bed;
         public EntityPlayer Player;
         public EntityVelocity Velocity;
         public EntityNewPosition NewPosition;
