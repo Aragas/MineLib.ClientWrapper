@@ -45,11 +45,11 @@ namespace MineLib.ClientWrapper
                 NextState = NextState.Login,
             });
 
-            Client.SendPacket(new LoginStartPacket { Name = "Aragasas" });
+            Client.SendPacket(new LoginStartPacket { Name = "TestBot" });
 
             while (Client.State != ServerState.Play) { }
 
-            /* -- Causes bad packet on server
+            ///* -- Causes bad packet on server
             Client.SendPacket(new ClientSettingsPacket
             {
                 Locale = "en_GB",
@@ -59,7 +59,7 @@ namespace MineLib.ClientWrapper
                 Difficulty = Difficulty.Normal,
                 ShowCape = true
             });
-            */
+            //*/
 
             Client.SendPacket(new PluginMessagePacket
             {
