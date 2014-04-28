@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using MineLib.Network.Enums;
 using MineLib.Network.Packets;
 
@@ -12,7 +11,7 @@ namespace MineLib.ClientWrapper
             // -- Debugging
             Console.WriteLine("ID: 0x" + String.Format("{0:X}", id));
             Console.WriteLine(" ");
-            packets.Add(packet);
+            Packets.Add(packet);
             // -- Debugging
         }
     }

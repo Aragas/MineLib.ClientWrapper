@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using MineLib.ClientWrapper.BigData;
 using MineLib.ClientWrapper.Data.Anvil;
-using MineLib.Network.Data;
 using MineLib.Network.Events;
 using MineLib.Network.Packets;
 using MineLib.Network.Packets.Server;
@@ -13,8 +11,7 @@ namespace MineLib.ClientWrapper
     public partial class Minecraft
     {
         // -- Debugging
-        public List<string> ChatHistory = new List<string>();
-        public List<IPacket> MapError = new List<IPacket>();
+        public readonly List<string> ChatHistory = new List<string>();
         // -- Debugging
 
         public event PacketsHandler FirePacketHandled;
@@ -104,22 +101,11 @@ namespace MineLib.ClientWrapper
         {
             var PlayerPositionAndLook = (PlayerPositionAndLookPacket) packet;
 
-            if (!Player.Position.Initialized)
-            {
-                Player.Position.Vector3 = PlayerPositionAndLook.Vector3;
-                Player.Look.Yaw = PlayerPositionAndLook.Yaw;
-                Player.Look.Pitch = PlayerPositionAndLook.Pitch;
-                Player.Position.OnGround = PlayerPositionAndLook.OnGround;
-
-                Player.Position.Initialized = true;
-            }
-            else
-            {
-                Player.NewPosition.Vector3 = PlayerPositionAndLook.Vector3;
-                Player.NewPosition.Yaw = PlayerPositionAndLook.Yaw;
-                Player.NewPosition.Pitch = PlayerPositionAndLook.Pitch;
-                Player.NewPosition.OnGround = PlayerPositionAndLook.OnGround;
-            }
+            // Force to new position.
+            Player.Position.Vector3 = PlayerPositionAndLook.Vector3;
+            Player.Look.Yaw = PlayerPositionAndLook.Yaw;
+            Player.Look.Pitch = PlayerPositionAndLook.Pitch;
+            Player.Position.OnGround = PlayerPositionAndLook.OnGround;
 
             SendPacket(new Network.Packets.Client.PlayerPositionPacket
             {
@@ -175,8 +161,10 @@ namespace MineLib.ClientWrapper
             Entities[SpawnPlayer.EntityID].Player.UUID = SpawnPlayer.PlayerUUID;
             Entities[SpawnPlayer.EntityID].Player.Name = SpawnPlayer.PlayerName;
             Entities[SpawnPlayer.EntityID].Position = SpawnPlayer.Vector3;
+
             Entities[SpawnPlayer.EntityID].Look.Yaw = SpawnPlayer.Yaw;
             Entities[SpawnPlayer.EntityID].Look.Pitch = SpawnPlayer.Pitch;
+
             Entities[SpawnPlayer.EntityID].Metadata = SpawnPlayer.Metadata;
         }
 
@@ -198,9 +186,10 @@ namespace MineLib.ClientWrapper
                 Entities.Add(SpawnMob.EntityID, new Entity {EntityID = SpawnMob.EntityID});
 
             Entities[SpawnMob.EntityID].Position = SpawnMob.Vector3;
+
             Entities[SpawnMob.EntityID].Look.Yaw = SpawnMob.Yaw;
-            Entities[SpawnMob.EntityID].Look.HeadPitch = SpawnMob.HeadPitch;
             Entities[SpawnMob.EntityID].Look.Pitch = SpawnMob.Pitch;
+
             Entities[SpawnMob.EntityID].Velocity.VelocityX = SpawnMob.VelocityX;
             Entities[SpawnMob.EntityID].Velocity.VelocityY = SpawnMob.VelocityY;
             Entities[SpawnMob.EntityID].Velocity.VelocityZ = SpawnMob.VelocityZ;
@@ -252,7 +241,7 @@ namespace MineLib.ClientWrapper
             if (!Entities.ContainsKey(EntityRelativeMove.EntityID))
                 Entities.Add(EntityRelativeMove.EntityID, new Entity {EntityID = EntityRelativeMove.EntityID});
 
-            Entities[EntityRelativeMove.EntityID].NewPosition.Vector3 = EntityRelativeMove.DeltaVector3; //Nope
+            Entities[EntityRelativeMove.EntityID].Position = EntityRelativeMove.DeltaVector3; //Nope
         }
 
         private void OnEntityLook(IPacket packet)
@@ -262,8 +251,8 @@ namespace MineLib.ClientWrapper
             if (!Entities.ContainsKey(EntityLook.EntityID))
                 Entities.Add(EntityLook.EntityID, new Entity {EntityID = EntityLook.EntityID});
 
-            Entities[EntityLook.EntityID].NewPosition.Yaw = EntityLook.Yaw;
-            Entities[EntityLook.EntityID].NewPosition.Pitch = EntityLook.Pitch;
+            Entities[EntityLook.EntityID].Look.Yaw = EntityLook.Yaw;
+            Entities[EntityLook.EntityID].Look.Pitch = EntityLook.Pitch;
         }
 
         private void OnEntityLookAndRelativeMove(IPacket packet)
@@ -274,9 +263,9 @@ namespace MineLib.ClientWrapper
                 Entities.Add(EntityLookAndRelativeMove.EntityID,
                     new Entity {EntityID = EntityLookAndRelativeMove.EntityID});
 
-            Entities[EntityLookAndRelativeMove.EntityID].NewPosition.Vector3 = EntityLookAndRelativeMove.DeltaVector3; //Nope
-            Entities[EntityLookAndRelativeMove.EntityID].NewPosition.Yaw = EntityLookAndRelativeMove.Yaw;
-            Entities[EntityLookAndRelativeMove.EntityID].NewPosition.Pitch = EntityLookAndRelativeMove.Pitch;
+            Entities[EntityLookAndRelativeMove.EntityID].Position = EntityLookAndRelativeMove.DeltaVector3; //Nope
+            Entities[EntityLookAndRelativeMove.EntityID].Look.Yaw = EntityLookAndRelativeMove.Yaw;
+            Entities[EntityLookAndRelativeMove.EntityID].Look.Pitch = EntityLookAndRelativeMove.Pitch;
         }
 
         private void OnEntityTeleport(IPacket packet)
@@ -286,9 +275,9 @@ namespace MineLib.ClientWrapper
             if (!Entities.ContainsKey(EntityTeleport.EntityID))
                 Entities.Add(EntityTeleport.EntityID, new Entity {EntityID = EntityTeleport.EntityID});
 
-            Entities[EntityTeleport.EntityID].NewPosition.Vector3 = EntityTeleport.Vector3;
-            Entities[EntityTeleport.EntityID].NewPosition.Yaw = EntityTeleport.Yaw;
-            Entities[EntityTeleport.EntityID].NewPosition.Pitch = EntityTeleport.Pitch;
+            Entities[EntityTeleport.EntityID].Position = EntityTeleport.Vector3;
+            Entities[EntityTeleport.EntityID].Look.Yaw = EntityTeleport.Yaw;
+            Entities[EntityTeleport.EntityID].Look.Pitch = EntityTeleport.Pitch;
         }
 
         private void OnEntityHeadLook(IPacket packet)
@@ -421,11 +410,8 @@ namespace MineLib.ClientWrapper
                 return;
             }
 
-            // -- Decompress the data
-            byte[] decompressedData = Decompressor.Decompress(ChunkData.Data);
-
             // -- Create new chunk
-            var newChunk = new NewChunk
+            var chunk = new NewChunk
             {
                 Coordinates = ChunkData.Coordinates,
                 PrimaryBitMap = ChunkData.PrimaryBitMap,
@@ -434,10 +420,13 @@ namespace MineLib.ClientWrapper
                 GroundUp = ChunkData.GroundUp
             };
 
-            newChunk.ReadChunkData(decompressedData);
+            // -- Decompress the data
+            byte[] decompressedData = Decompressor.Decompress(ChunkData.Data);
+
+            chunk.ReadChunkData(decompressedData);
 
             // -- Add the chunk to the world
-            World.Chunks.Add(newChunk);     
+            World.Chunks.Add(chunk);     
         }
 
         private void OnMultiBlockChange(IPacket packet)
@@ -472,17 +461,14 @@ namespace MineLib.ClientWrapper
             var i = 0;
             foreach (var metadata in MapChunkBulk.MetaInformation)
             {
-                chunks[i] = new NewChunk();
-                chunks[i].Coordinates = metadata.Coordinates;
-                if (metadata.Coordinates.Z > 1000) // bug
+                chunks[i] = new NewChunk
                 {
-                    MapError.Add(MapChunkBulk);
-                    return;
-                }
-                chunks[i].PrimaryBitMap = metadata.PrimaryBitMap;
-                chunks[i].AddBitMap = metadata.AddBitMap;
-                chunks[i].SkyLightSent = metadata.SkyLightSend;
-                chunks[i].GroundUp = metadata.GroundUp;
+                    Coordinates = metadata.Coordinates,
+                    PrimaryBitMap = metadata.PrimaryBitMap,
+                    AddBitMap = metadata.AddBitMap,
+                    SkyLightSent = metadata.SkyLightSend,
+                    GroundUp = metadata.GroundUp
+                };
 
                 DecompressedData = chunks[i].ReadChunkData(DecompressedData);
                 // -- Calls the chunk class to take all of the bytes it needs, and return whats left.

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MineLib.Network.Data;
 using MineLib.Network.Data.EntityMetadata;
 using MineLib.Network.Enums;
@@ -30,11 +31,30 @@ namespace MineLib.ClientWrapper.BigData
         public Coordinates3D Bed;
         public EntityPlayer Player;
         public EntityVelocity Velocity;
-        public EntityNewPosition NewPosition;
 
         public bool IsPlayer
         {
             get { return Player.Name != null && Player.UUID != null; }
+        }
+
+        public static Vector3 ToVector3(byte yaw, byte pitch)
+        {
+            return new Vector3
+            {
+                X = -Math.Cos(pitch) * Math.Sin(yaw),
+                Y = -Math.Sin(pitch),
+                Z =  Math.Cos(pitch) * Math.Cos(yaw),
+            };
+        }
+
+        public static int ToYaw(Vector3 position, Vector3 look)
+        {
+            var l = look.X - position.X;
+            var w = look.Z - position.Z;
+            var c = Math.Sqrt(l * l + w * w);
+            var alpha1 = -Math.Asin(l / c) / Math.PI * 180;
+            var alpha2 = Math.Acos(w / c) / Math.PI * 180;
+            return alpha2 > 90 ? (180 - (int)alpha1) : (int)alpha1;
         }
     }
 
@@ -44,13 +64,6 @@ namespace MineLib.ClientWrapper.BigData
         public ItemStack Item;
 
         public short CurrentItem;
-    }
-
-    public struct EntityLook
-    {
-        public byte Yaw;
-        public byte HeadPitch;
-        public byte Pitch;
     }
 
     public struct EntityEffect
@@ -66,19 +79,17 @@ namespace MineLib.ClientWrapper.BigData
         public string Name;
     }
 
+    public struct EntityLook
+    {
+        public byte Yaw;
+        public byte Pitch;
+    }
+
     public struct EntityVelocity
     {
         public short VelocityX;
         public short VelocityY;
         public short VelocityZ;
-    }
-
-    public struct EntityNewPosition
-    {
-        public Vector3 Vector3;
-        public float Yaw;
-        public float Pitch;
-        public bool OnGround;
     }
 
 }

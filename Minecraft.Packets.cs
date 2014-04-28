@@ -8,7 +8,7 @@ namespace MineLib.ClientWrapper
     public partial class Minecraft
     {
         // -- Debugging
-        List<IPacket> packets = new List<IPacket>();
+        public readonly List<IPacket> Packets = new List<IPacket>();
         // -- Debugging
 
         private void RaisePacketHandled(IPacket packet, int id, ServerState? state)
@@ -16,7 +16,7 @@ namespace MineLib.ClientWrapper
             // -- Debugging
             Console.WriteLine("ID: 0x" + String.Format("{0:X}", id));
             Console.WriteLine(" ");
-            packets.Add(packet);
+            Packets.Add(packet);
             // -- Debugging
 
             switch (state)

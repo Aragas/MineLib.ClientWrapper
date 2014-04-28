@@ -11,7 +11,7 @@ namespace MineLib.ClientWrapper
     public static class TestClient
     {
         public static Minecraft Client;
-        private static ResponseData ServerData;
+        public static ResponseData ServerData;
 
         public static void Main(string[] args)
         {
@@ -45,10 +45,11 @@ namespace MineLib.ClientWrapper
                 NextState = NextState.Login,
             });
 
-            Client.SendPacket(new LoginStartPacket { Name = "TestBot" });
+            Client.SendPacket(new LoginStartPacket { Name = "Aragasas" });
 
             while (Client.State != ServerState.Play) { }
 
+            /* -- Causes bad packet on server
             Client.SendPacket(new ClientSettingsPacket
             {
                 Locale = "en_GB",
@@ -58,6 +59,7 @@ namespace MineLib.ClientWrapper
                 Difficulty = Difficulty.Normal,
                 ShowCape = true
             });
+            */
 
             Client.SendPacket(new PluginMessagePacket
             {

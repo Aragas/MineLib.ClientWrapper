@@ -8,6 +8,10 @@ namespace MineLib.ClientWrapper
 {
     public partial class Minecraft
     {
+        // -- Debugging
+        public readonly List<ChatMessage> ChatTextHistory = new List<ChatMessage>();
+        // -- Debugging
+
         public struct Extra
         {
             [JsonProperty("color")]
@@ -76,16 +80,14 @@ namespace MineLib.ClientWrapper
 
         }
 
-        public List<ChatMessage> ChatMessageHistory = new List<ChatMessage>(); 
 
-
-        private void PlaySound(string SoundName, Coordinates3D vector3,
-            float Volume, byte Pitch)
+        private void PlaySound(string soundName, Coordinates3D coordinates,
+            float volume, byte pitch)
         {
         }
 
-        private void PlayEffect(EffectID EffectID, Coordinates3D vector3,
-            int Data, bool DisableRelativeVolume)
+        private void PlayEffect(EffectID effectId, Coordinates3D coordinates,
+            int data, bool disableRelativeVolume)
         {
         }
 
@@ -93,10 +95,10 @@ namespace MineLib.ClientWrapper
         {
            var Text = JsonConvert.DeserializeObject<ChatMessage>(message);
 
-            ChatMessageHistory.Add(Text);
+            ChatTextHistory.Add(Text);
         }
 
-        private void EditSign(Coordinates3D vector3)
+        private void EditSign(Coordinates3D coordinates)
         {
         }
     }

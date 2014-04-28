@@ -17,7 +17,6 @@ namespace MineLib.ClientWrapper.BigData
         public int EntityID;
 
         public PlayerPosition Position; //
-        public PlayerNewPosition NewPosition; //
         public PlayerLook Look; //
         public PlayerAbilities Abilities;
 
@@ -67,14 +66,6 @@ namespace MineLib.ClientWrapper.BigData
         public Vector3 Vector3;
         public bool OnGround;
         public bool Initialized;
-    }
-
-    public struct PlayerNewPosition
-    {
-        public Vector3 Vector3;
-        public float Yaw;
-        public float Pitch;
-        public bool OnGround;
     }
 
     public struct PlayerAbilities

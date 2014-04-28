@@ -12,7 +12,7 @@ namespace MineLib.ClientWrapper
     /// <summary>
     ///     Wrapper for Network of MineLib.Net.
     /// </summary>
-    public partial class Minecraft : IMinecraft, IDisposable
+    public partial class Minecraft : IMinecraftClient, IDisposable
     {
         // -- Debugging
         public List<IPacket> LastPackets
@@ -21,13 +21,13 @@ namespace MineLib.ClientWrapper
             {
                 try
                 {
-                    return packets.Skip(Math.Max(0, packets.Count() - 50)).Take(50).ToList();
+                    return Packets.Skip(Math.Max(0, Packets.Count() - 50)).Take(50).ToList();
                 }
                 catch { }
                 return null;
             }
         }
-        public IPacket LastPacket { get { return packets[packets.Count - 1]; } }
+        public IPacket LastPacket { get { return Packets[Packets.Count - 1]; } }
         // -- Debugging
 
         #region Variables
