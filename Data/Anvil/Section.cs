@@ -1,4 +1,5 @@
 ﻿using System;
+using MineLib.Network.Data;
 
 namespace MineLib.ClientWrapper.Data.Anvil
 {
@@ -6,71 +7,87 @@ namespace MineLib.ClientWrapper.Data.Anvil
     {
         public const byte Width = 16, Height = 16, Depth = 16;
 
-        public byte[] Blocks;
-        public byte[] Metadata;
-        public byte[] BlockLight;
-        public byte[] Skylight;
+        public byte[] RawBlocks;
+        public byte[] RawMetadata;
+        public byte[] RawBlockLight;
+        public byte[] RawSkylight;
         public byte Y;
+
+        public Block[] Blocks;
+
+        public void FillBlocks()
+        {
+            for (var i = 0; i < Blocks.Length; i++)
+            {
+                var id = RawBlocks[i];
+                var meta = RawMetadata[i];
+
+                if (id == 0)
+                {
+                    Blocks[i] = new Block(0, 0, "Air");
+                    continue;
+                }
+
+                Blocks[i] = Block.GetBlock(id, meta);
+            }
+        }
 
         public Section(byte y)
         {
             Y = y;
-            Blocks = new byte[4096];
-            Metadata = new byte[4096];
-            BlockLight = new byte[4096];
-            Skylight = new byte[4096];
+
+            Blocks = new Block[4096];
+
+            RawBlocks = new byte[4096];
+            RawMetadata = new byte[4096];
+            RawBlockLight = new byte[4096];
+            RawSkylight = new byte[4096];
         }
 
-        public void SetBlock(int x, int y, int z, int id)
+        public Block GetBlock(Coordinates3D coordinates)
         {
-            int index = x + (z * 16) + (y * 16 * 16);
-            Blocks[index] = (byte)id;
+            var index = coordinates.X + (coordinates.Z * 16) + (coordinates.Y * 16 * 16);
+
+            var block = Blocks[index];
+            Blocks[index].Coordinates = coordinates;
+            Blocks[index].Chunk = new Coordinates2D
+            {
+                X = (int) Math.Floor(decimal.Divide(coordinates.X, 16)),
+                Z = (int) Math.Floor(decimal.Divide(coordinates.Z, 16))
+            };
+
+            return block;
         }
 
-        public Block GetBlock(int x, int y, int z)
+        public void SetBlock(Coordinates3D coordinates, Block block)
         {
-            int index = x + (z * 16) + (y * 16 * 16);
-            var thisBlock = new Block((int)Blocks[index], x, y, z, (int)Math.Floor(decimal.Divide(x, 16)), (int)Math.Floor(decimal.Divide(z, 16)));
+            var index = coordinates.X + (coordinates.Z * 16) + (coordinates.Y * 16 * 16);
 
-            return thisBlock;
-        }
-
-        public int GetBlockMetadata(int x, int y, int z)
-        {
-            int index = (x + (z * 16) + (y * 16 * 16));
-            byte value = Metadata[index];
-
-            return value;
-        }
-
-        public void SetBlockMetadata(int x, int y, int z, byte data)
-        {
-            int index = (x + (z * 16) + (y * 16 * 16));
-            Metadata[index] = data;
+            Blocks[index] = block;
         }
 
         public byte GetBlockLighting(int x, int y, int z)
         {
             int index = (x + (z * 16) + (y * 16 * 16));
-            return BlockLight[index];
+            return RawBlockLight[index];
         }
 
         public void SetBlockLighting(int x, int y, int z, byte data)
         {
             int index = (x + (z * 16) + (y * 16 * 16));
-            BlockLight[index] = data;
+            RawBlockLight[index] = data;
         }
 
         public byte GetBlockSkylight(int x, int y, int z)
         {
             int index = (x + (z * 16) + (y * 16 * 16));
-            return Skylight[index];
+            return RawSkylight[index];
         }
 
         public void SetBlockSkylight(int x, int y, int z, byte data)
         {
             int index = (x + (z * 16) + (y * 16 * 16));
-            Skylight[index] = data;
+            RawSkylight[index] = data;
         }
     }
 }

@@ -393,7 +393,7 @@ namespace MineLib.ClientWrapper
             Entities[EntityProperties.EntityID].Properties = EntityProperties.Properties;
         }
 
-        private void OnChunkData(IPacket packet)
+        private void OnChunkData(IPacket packet) // -- Works
         {
             var ChunkData = (ChunkDataPacket) packet;
 
@@ -411,7 +411,7 @@ namespace MineLib.ClientWrapper
             }
 
             // -- Create new chunk
-            var chunk = new NewChunk
+            var chunk = new Chunk
             {
                 Coordinates = ChunkData.Coordinates,
                 PrimaryBitMap = ChunkData.PrimaryBitMap,
@@ -426,17 +426,36 @@ namespace MineLib.ClientWrapper
             chunk.ReadChunkData(decompressedData);
 
             // -- Add the chunk to the world
-            World.Chunks.Add(chunk);     
+            World.SetChunk(chunk);     
         }
 
         private void OnMultiBlockChange(IPacket packet)
         {
+            var MultiBlockChange = (MultiBlockChangePacket)packet;
+            for (var i = 0; i < MultiBlockChange.RecordCount; i++)
+            {
+                var block = new Block
+                {
+                    Id = MultiBlockChange.RecordsArray[i].BlockID,
+                    Meta = MultiBlockChange.RecordsArray[i].Metadata,
+                };
+                World.SetBlock(MultiBlockChange.RecordsArray[i].Coordinates, block);
+            }
+           
         }
 
-        private void OnBlockChange(IPacket packet)
+        private void OnBlockChange(IPacket packet) // -- Works
         {
             var BlockChange = (BlockChangePacket) packet;
 
+            var data = new Block
+            {
+                Id = BlockChange.BlockID,
+                Meta = BlockChange.BlockMetadata,
+                Name = Block.GetName(BlockChange.BlockID, BlockChange.BlockMetadata)
+            };
+
+            World.SetBlock(BlockChange.Coordinates, data);
         }
 
         private void OnBlockAction(IPacket packet)
@@ -447,11 +466,11 @@ namespace MineLib.ClientWrapper
         {
         }
 
-        private void OnMapChunkBulk(IPacket packet)
+        private void OnMapChunkBulk(IPacket packet) // -- Works in Online mode, bug in Pirate mode
         {
             var MapChunkBulk = (MapChunkBulkPacket) packet;
 
-            var chunks = new NewChunk[MapChunkBulk.ChunkColumnCount];
+            var chunks = new Chunk[MapChunkBulk.ChunkColumnCount];
 
             var DecompressedData = Decompressor.Decompress(MapChunkBulk.ChunkData);
 
@@ -461,7 +480,7 @@ namespace MineLib.ClientWrapper
             var i = 0;
             foreach (var metadata in MapChunkBulk.MetaInformation)
             {
-                chunks[i] = new NewChunk
+                chunks[i] = new Chunk
                 {
                     Coordinates = metadata.Coordinates,
                     PrimaryBitMap = metadata.PrimaryBitMap,
@@ -473,7 +492,7 @@ namespace MineLib.ClientWrapper
                 DecompressedData = chunks[i].ReadChunkData(DecompressedData);
                 // -- Calls the chunk class to take all of the bytes it needs, and return whats left.
 
-                World.Chunks.Add(chunks[i]);
+                World.SetChunk(chunks[i]);
                 i++;
             }
         }

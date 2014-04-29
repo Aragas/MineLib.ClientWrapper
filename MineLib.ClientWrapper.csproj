@@ -91,9 +91,8 @@
     <Compile Include="BigData\Vehicle.cs" />
     <Compile Include="BigData\World.cs" />
     <Compile Include="Data\Anvil\Block.cs" />
-    <Compile Include="Data\Anvil\Chunk.cs" />
     <Compile Include="Data\Anvil\Decompressor.cs" />
-    <Compile Include="Data\Anvil\NewChunk.cs" />
+    <Compile Include="Data\Anvil\Chunk.cs" />
     <Compile Include="Data\Anvil\Section.cs" />
     <Compile Include="Minecraft.Classic.cs" />
     <Compile Include="Minecraft.Client.cs" />
