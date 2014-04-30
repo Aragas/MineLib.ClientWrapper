@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using MineLib.Network.Data;
 
 namespace MineLib.ClientWrapper.Data.Anvil
@@ -10,30 +11,35 @@ namespace MineLib.ClientWrapper.Data.Anvil
         private const int BlockDataLength = Section.Width * Section.Depth * Section.Height;
         private const int NibbleDataLength = BlockDataLength / 2;
 
-        public Coordinates2D Coordinates { get; set; }
-        public ushort PrimaryBitMap { get; set; }
-        public ushort AddBitMap { get; set; }
-        public bool SkyLightSent { get; set; }
-        public bool GroundUp { get; set; }
+        public Coordinates2D Coordinates;
+        public ushort PrimaryBitMap;
+        public ushort AddBitMap;
+        public bool SkyLightSent;
+        public bool GroundUp;
 
-        public byte[] Biomes { get; set; }
+        public byte[] Biomes;
 
-        public Section[] Sections { get; set; }
-
+        public Section[] Sections;
+    
         public Chunk()
         {
             Biomes = new byte[Width * Depth];
 
             Sections = new Section[16];
-            for (int i = 0; i < Sections.Length; i++)
+            for (var i = 0; i < Sections.Length; i++)
                 Sections[i] = new Section((byte)i);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Filled Sections: {0}", GetFilledSectionsCount());
         }
 
         private static int GetSectionCount(ushort bitMap)
         {
             // Get the total sections included in the bitMap
             var sectionCount = 0;
-            for (int y = 0; y < 16; y++)
+            for (var y = 0; y < 16; y++)
             {
                 if ((bitMap & (1 << y)) > 0)
                     sectionCount++;
@@ -107,14 +113,14 @@ namespace MineLib.ClientWrapper.Data.Anvil
 
         #endregion MapChunkBulk
 
-        byte[] CreateMetadataBytes(byte[] oldMeta)
+        private static byte[] CreateMetadataBytes(IList<byte> oldMeta)
         {
-            byte[] newMeta = new byte[4096];
+            var newMeta = new byte[4096];
 
-            for (int i = 0; i < oldMeta.Length; i++)
+            for (var i = 0; i < oldMeta.Count; i++)
             {
-                byte block2 = (byte)((oldMeta[i] >> 4) & 15);
-                byte block1 = (byte)(oldMeta[i] & 15);
+                var block2 = (byte)((oldMeta[i] >> 4) & 15);
+                var block1 = (byte)(oldMeta[i] & 15);
 
                 newMeta[(i * 2)] = block1;
                 newMeta[(i * 2) + 1] = block2;
@@ -127,14 +133,14 @@ namespace MineLib.ClientWrapper.Data.Anvil
         {
             // -- Updates the block in this chunk.
 
-            var ChunkX = decimal.Divide(coordinates.X, 16);
-            var ChunkZ = decimal.Divide(coordinates.Z, 16);
+            var chunkX = decimal.Divide(coordinates.X, 16);
+            var chunkZ = decimal.Divide(coordinates.Z, 16);
 
-            ChunkX = Math.Floor(ChunkX);
-            ChunkZ = Math.Floor(ChunkZ);
+            chunkX = Math.Floor(chunkX);
+            chunkZ = Math.Floor(chunkZ);
 
             // -- https://github.com/Azzi777/Umbra-Voxel-Engine/blob/master/Umbra%20Voxel%20Engine/Implementations/ChunkManager.cs#L172
-            if (ChunkX != Coordinates.X || ChunkZ != Coordinates.Z)
+            if (chunkX != Coordinates.X || chunkZ != Coordinates.Z)
                 throw new Exception("You stupid asshole!"); 
 
             var thisSection = GetSectionByNumber(coordinates.Y);
@@ -148,28 +154,28 @@ namespace MineLib.ClientWrapper.Data.Anvil
             return thisSection.GetBlock(GetSectionCoordinates(coordinates));
         }
 
-        public byte GetBlockLight(int x, int y, int z)
+        public byte GetBlockLight(Coordinates3D coordinates)
         {
-            var thisSection = GetSectionByNumber(y);
-            return thisSection.GetBlockLighting(GetXinSection(x), GetPositionInSection(y), GetZinSection(z));
+            var thisSection = GetSectionByNumber(coordinates.Y);
+            return thisSection.GetBlockLighting(GetSectionCoordinates(coordinates));
         }
 
-        public void SetBlockLight(int x, int y, int z, byte light)
+        public void SetBlockLight(Coordinates3D coordinates, byte light)
         {
-            var thisSection = GetSectionByNumber(y);
-            thisSection.SetBlockLighting(GetXinSection(x), GetPositionInSection(y), GetZinSection(z), light);
+            var thisSection = GetSectionByNumber(coordinates.Y);
+            thisSection.SetBlockLighting(GetSectionCoordinates(coordinates), light);
         }
 
-        public byte GetBlockSkylight(int x, int y, int z)
+        public byte GetBlockSkylight(Coordinates3D coordinates)
         {
-            var thisSection = GetSectionByNumber(y);
-            return thisSection.GetBlockSkylight(GetXinSection(x), GetPositionInSection(y), GetZinSection(z));
+            var thisSection = GetSectionByNumber(coordinates.Y);
+            return thisSection.GetBlockSkylight(GetSectionCoordinates(coordinates));
         }
 
-        public void SetBlockSkylight(int x, int y, int z, byte light)
+        public void SetBlockSkylight(Coordinates3D coordinates, byte light)
         {
-            var thisSection = GetSectionByNumber(y);
-            thisSection.SetBlockSkylight(GetXinSection(x), GetPositionInSection(y), GetZinSection(z), light);
+            var thisSection = GetSectionByNumber(coordinates.Y);
+            thisSection.SetBlockSkylight(GetSectionCoordinates(coordinates), light);
         }
 
         public byte GetBlockBiome(Coordinates2D coordinates)
@@ -183,6 +189,7 @@ namespace MineLib.ClientWrapper.Data.Anvil
         }
 
         #region Helping Methods
+
         private Section GetSectionByNumber(int blockY)
         {
             return Sections[(byte)(blockY / 16)];
@@ -196,21 +203,34 @@ namespace MineLib.ClientWrapper.Data.Anvil
                 Z = GetZinSection(coordinates.Z)
             };
         }
-        private int GetXinSection(int BlockX)
+        private int GetXinSection(int blockX)
         {
-            return Math.Abs(BlockX - (Coordinates.X * 16));
+            return Math.Abs(blockX - (Coordinates.X * 16));
         }
-        private int GetPositionInSection(int blockY)
+        private static int GetPositionInSection(int blockY)
         {
-            return blockY % 16; // Credits: SirCmpwn Craft.net
+            return blockY % 16;
         }
-        private int GetZinSection(int BlockZ)
+        private int GetZinSection(int blockZ)
         {
             if (Coordinates.Z == 0)
-                return BlockZ;
+                return blockZ;
 
-            return BlockZ % Coordinates.Z;
+            return blockZ % Coordinates.Z;
         }
+
+        private int GetFilledSectionsCount()
+        {
+            var count = 0;
+            foreach (var section in Sections)
+            {
+                if (section.IsFilled)
+                    count++;
+            }
+            return count;
+        }
+
         #endregion
+
     }
 }

@@ -8,6 +8,32 @@ namespace MineLib.ClientWrapper.BigData
 {
     public class Entity
     {
+        public int EntityID;
+
+        public MetadataDictionary Metadata;
+
+        public EntityPlayer Player;
+
+        public Animation Animation;
+
+        public Vector3 Position;
+        public EntityLook Look;
+
+        public Coordinates3D Bed;
+
+        public EntityStatus Status;
+        public EntityEquipment Equipment;
+
+        public EntityVelocity Velocity;
+
+        public List<EntityEffect> Effects;
+
+        public EntityProperty[] Properties;
+
+        public Vehicle Vehicle;
+
+        public bool Leash;
+
         public Entity()
         {
             Metadata = new MetadataDictionary();
@@ -15,22 +41,13 @@ namespace MineLib.ClientWrapper.BigData
             Effects = new List<EntityEffect>();
         }
 
-        public int EntityID;
-        public MetadataDictionary Metadata;
-
-        public Vehicle Vehicle;
-        public bool Leash;
-        public EntityProperty[] Properties;
-
-        public EntityStatus Status;
-        public EntityEquipment Equipment;
-        public Animation Animation;
-        public Vector3 Position;
-        public EntityLook Look;
-        public List<EntityEffect> Effects;
-        public Coordinates3D Bed;
-        public EntityPlayer Player;
-        public EntityVelocity Velocity;
+        public Entity(int id)
+        {
+            EntityID = id;
+            Metadata = new MetadataDictionary();
+            Vehicle = new Vehicle();
+            Effects = new List<EntityEffect>();
+        }
 
         public bool IsPlayer
         {

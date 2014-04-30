@@ -429,7 +429,7 @@ namespace MineLib.ClientWrapper
             World.SetChunk(chunk);     
         }
 
-        private void OnMultiBlockChange(IPacket packet)
+        private void OnMultiBlockChange(IPacket packet) // -- Works
         {
             var MultiBlockChange = (MultiBlockChangePacket)packet;
             for (var i = 0; i < MultiBlockChange.RecordCount; i++)

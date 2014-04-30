@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using MineLib.ClientWrapper.BigData;
 using MineLib.Network.Data;
 
 namespace MineLib.ClientWrapper.Data.Anvil
@@ -23,7 +24,19 @@ namespace MineLib.ClientWrapper.Data.Anvil
                 if (blockNew.Id == id && blockNew.Meta == meta)
                     return blockNew;
             }
-            return null;
+
+            // -- Debugging
+            var text = string.Format("ID: {0}, Meta: {1}", id, meta);
+            if (!World.UnsupportedBlockList.Contains(text))
+                World.UnsupportedBlockList.Add(text);
+            // -- Debugging
+
+            return new Block
+            {
+                Id = id,
+                Meta = meta,
+                Name = string.Format("Unsupported Block ID: {0}, Meta: {1}", id, meta)
+            };
         }
 
         #region List

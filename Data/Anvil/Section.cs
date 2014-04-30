@@ -3,6 +3,7 @@ using MineLib.Network.Data;
 
 namespace MineLib.ClientWrapper.Data.Anvil
 {
+    // This class don't use RawData in any way. Only Blocks. I mean hash and other stuff.
     public class Section
     {
         public const byte Width = 16, Height = 16, Depth = 16;
@@ -15,6 +16,7 @@ namespace MineLib.ClientWrapper.Data.Anvil
 
         public Block[] Blocks;
 
+        public bool IsFilled;
         public void FillBlocks()
         {
             for (var i = 0; i < Blocks.Length; i++)
@@ -30,6 +32,7 @@ namespace MineLib.ClientWrapper.Data.Anvil
 
                 Blocks[i] = Block.GetBlock(id, meta);
             }
+            IsFilled = true;
         }
 
         public Section(byte y)
@@ -44,9 +47,14 @@ namespace MineLib.ClientWrapper.Data.Anvil
             RawSkylight = new byte[4096];
         }
 
+        public override string ToString()
+        {
+            return IsFilled ? "Filled" : "Empty";
+        }
+
         public Block GetBlock(Coordinates3D coordinates)
         {
-            var index = coordinates.X + (coordinates.Z * 16) + (coordinates.Y * 16 * 16);
+            var index = GetIndex(coordinates);
 
             var block = Blocks[index];
             Blocks[index].Coordinates = coordinates;
@@ -61,33 +69,58 @@ namespace MineLib.ClientWrapper.Data.Anvil
 
         public void SetBlock(Coordinates3D coordinates, Block block)
         {
-            var index = coordinates.X + (coordinates.Z * 16) + (coordinates.Y * 16 * 16);
+            var index = GetIndex(coordinates);
 
             Blocks[index] = block;
         }
 
-        public byte GetBlockLighting(int x, int y, int z)
+        public byte GetBlockLighting(Coordinates3D coordinates)
         {
-            int index = (x + (z * 16) + (y * 16 * 16));
+            var index = GetIndex(coordinates);
             return RawBlockLight[index];
         }
 
-        public void SetBlockLighting(int x, int y, int z, byte data)
+        public void SetBlockLighting(Coordinates3D coordinates, byte data)
         {
-            int index = (x + (z * 16) + (y * 16 * 16));
+            var index = GetIndex(coordinates);
             RawBlockLight[index] = data;
         }
 
-        public byte GetBlockSkylight(int x, int y, int z)
+        public byte GetBlockSkylight(Coordinates3D coordinates)
         {
-            int index = (x + (z * 16) + (y * 16 * 16));
+            var index = GetIndex(coordinates);
             return RawSkylight[index];
         }
 
-        public void SetBlockSkylight(int x, int y, int z, byte data)
+        public void SetBlockSkylight(Coordinates3D coordinates, byte data)
         {
-            int index = (x + (z * 16) + (y * 16 * 16));
+            var index = GetIndex(coordinates);
             RawSkylight[index] = data;
+        }
+
+        private static int GetIndex(Coordinates3D coordinates)
+        {
+            return (coordinates.X + (coordinates.Z * 16) + (coordinates.Y * 16 * 16));
+        }
+
+        public bool Equals(Block block)
+        {
+            return Blocks.Equals(block);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (obj.GetType() != typeof(Block)) return false;
+            return Equals((Block)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return Blocks.GetHashCode();
+            }
         }
     }
 }

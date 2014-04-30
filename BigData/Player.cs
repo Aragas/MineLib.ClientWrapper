@@ -2,36 +2,37 @@
 using System.Collections.Generic;
 using MineLib.Network.Data;
 using MineLib.Network.Enums;
-using MineLib.Network.Packets.Client;
 
 namespace MineLib.ClientWrapper.BigData
 {
     public class Player
     {
+        public int EntityID;
+
+        public PlayerAbilities Abilities;
+
+        public PlayerPosition Position;
+        public PlayerLook Look;
+
+        public Animation Animation;
+
+        public PlayerHealth Health;
+        public PlayerExperience Experience;
+        public PlayerItems Items;
+        public byte HeldItem;
+
+        public PlayerStatistics Statistics;
+
+        public PlayerScoreboardObjective ScoreboardObjective;
+
+        public List<PlayerEffect> Effects;
+        public List<PlayerWindow> Windows;
+
         public Player()
         {
             Effects = new List<PlayerEffect>();
             Windows = new List<PlayerWindow>();
         }
-
-        public int EntityID;
-
-        public PlayerPosition Position; //
-        public PlayerLook Look; //
-        public PlayerAbilities Abilities;
-
-        public PlayerHealth Health; //
-        public PlayerItems Items; //
-        public byte HeldItem; // //Slot
-        public PlayerExperience Experience; //
-        public Animation Animation;
-
-        ///
-        public PlayerStatistics Statistics;
-
-        public List<PlayerEffect> Effects;
-        public List<PlayerWindow> Windows;
-        public PlayerScoreboardObjective ScoreboardObjective;
 
         public void SetWindowItems(byte windowId, ItemStack[] slotData)
         {
@@ -46,8 +47,8 @@ namespace MineLib.ClientWrapper.BigData
 
         }
 
-        public void OpenWindow(byte windowId, byte inventoryType, string windowTitle, byte NumberOfSlots,
-            bool UseProvidedWindowTitle, int? EntityID = 0)
+        public void OpenWindow(byte windowId, byte inventoryType, string windowTitle, byte numberOfSlots,
+            bool useProvidedWindowTitle, int? entityID = 0)
         {
         }
 
@@ -61,13 +62,6 @@ namespace MineLib.ClientWrapper.BigData
         }
     }
 
-    public struct PlayerPosition
-    {
-        public Vector3 Vector3;
-        public bool OnGround;
-        public bool Initialized;
-    }
-
     public struct PlayerAbilities
     {
         public byte Flags;
@@ -77,6 +71,13 @@ namespace MineLib.ClientWrapper.BigData
         public bool CreativeMode { get { return Convert.ToBoolean((Flags >> 0) & 1); } }
         public float FlyingSpeed;
         public float WalkingSpeed;
+    }
+
+    public struct PlayerPosition
+    {
+        public Vector3 Vector3;
+        public bool OnGround;
+        public bool Initialized;
     }
 
     public struct PlayerLook
@@ -92,12 +93,6 @@ namespace MineLib.ClientWrapper.BigData
         public float FoodSaturation;
     }
 
-    public struct PlayerItems
-    {
-        public byte WindowId;
-        public ItemStack[] SlotData;
-    }
-
     public struct PlayerExperience
     {
         public float ExperienceBar;
@@ -105,11 +100,26 @@ namespace MineLib.ClientWrapper.BigData
         public short TotalExperience;
     }
 
+    public struct PlayerItems
+    {
+        public byte WindowId;
+        public ItemStack[] SlotData;
+    }
+
     public struct PlayerStatistics
     {
         public int Count;
         public string[] StatisticsName;
         public int[] Value;
+    }
+
+    public struct PlayerScoreboardObjective
+    {
+        public string ObjectiveName;
+        public string ObjectiveValue;
+        public string ItemName;
+        public int Value;
+
     }
 
     public struct PlayerEffect
@@ -121,15 +131,6 @@ namespace MineLib.ClientWrapper.BigData
 
     public struct PlayerWindow
     {
-
-    }
-
-    public struct PlayerScoreboardObjective
-    {
-        public string ObjectiveName;
-        public string ObjectiveValue;
-        public string ItemName;
-        public int Value;
 
     }
 

@@ -4,7 +4,7 @@ using System.IO.Compression;
 
 namespace MineLib.ClientWrapper.Data.Anvil
 {
-    class Decompressor
+    public static class Decompressor
     {
         // ZLib Decompressor.
         public static byte[] Decompress(byte[] data)

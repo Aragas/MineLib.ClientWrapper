@@ -97,6 +97,7 @@
     <Compile Include="Minecraft.Classic.cs" />
     <Compile Include="Minecraft.Client.cs" />
     <Compile Include="Minecraft.cs" />
+    <Compile Include="Minecraft.Entity.cs" />
     <Compile Include="Minecraft.Events.cs" />
     <Compile Include="Minecraft.Packets.cs" />
     <Compile Include="Minecraft.Yggdrasil.cs" />
