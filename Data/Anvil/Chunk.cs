@@ -6,6 +6,7 @@ namespace MineLib.ClientWrapper.Data.Anvil
 {
     public class Chunk
     {
+
         public const int Width = 16, Height = 256, Depth = 16;
 
         private const int BlockDataLength = Section.Width * Section.Depth * Section.Height;
@@ -60,30 +61,29 @@ namespace MineLib.ClientWrapper.Data.Anvil
             {
                 if ((PrimaryBitMap & (1 << y)) > 0)
                 {
-                    var temp1 = new byte[2048];
-                    var temp2 = new byte[2048];
-                    var temp3 = new byte[2048];
-
                     // Blocks
-                    Array.Copy(data, y*BlockDataLength, Sections[y].RawBlocks, 0, BlockDataLength);
+                    Array.Copy(data, y * BlockDataLength, Sections[y].RawBlocks, 0, BlockDataLength);
 
                     // Metadata
-                    Array.Copy(data, (BlockDataLength*sectionCount) + (y*NibbleDataLength),
-                        temp1, 0, NibbleDataLength);
-                    Sections[y].RawMetadata = CreateMetadataBytes(temp1); // Convert half-byte to one-byte.
+                    var nibbleMetadata = new byte[2048];
+                    Array.Copy(data, (BlockDataLength * sectionCount) + (y * NibbleDataLength),
+                        nibbleMetadata, 0, NibbleDataLength);
+                    Sections[y].RawMetadata = CreateMetadataBytes(nibbleMetadata); // Convert half-byte to one-byte.
 
                     // BlocksLight
-                    Array.Copy(data, ((BlockDataLength + NibbleDataLength)*sectionCount) + (y*NibbleDataLength),
-                        temp2, 0, NibbleDataLength);
-                    Sections[y].RawBlockLight = CreateMetadataBytes(temp2); // Convert half-byte to one-byte.
+                    var nibbleBlocksLight = new byte[2048];
+                    Array.Copy(data, ((BlockDataLength + NibbleDataLength) * sectionCount) + (y * NibbleDataLength),
+                        nibbleBlocksLight, 0, NibbleDataLength);
+                    Sections[y].RawBlockLight = CreateMetadataBytes(nibbleBlocksLight); // Convert half-byte to one-byte.
 
                     // SkyLight
                     if (SkyLightSent)
                     {
+                        var nibbleSkyLight = new byte[2048];
                         Array.Copy(data,
-                            ((BlockDataLength + NibbleDataLength + NibbleDataLength)*sectionCount) +
-                            (y*NibbleDataLength), temp3, 0, NibbleDataLength);
-                        Sections[y].RawSkylight = CreateMetadataBytes(temp3); // Convert half-byte to one-byte.
+                            ((BlockDataLength + NibbleDataLength + NibbleDataLength) * sectionCount) +
+                            (y * NibbleDataLength), nibbleSkyLight, 0, NibbleDataLength);
+                        Sections[y].RawSkylight = CreateMetadataBytes(nibbleSkyLight); // Convert half-byte to one-byte.
                     }
 
                     Sections[y].FillBlocks();

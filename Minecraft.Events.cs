@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using MineLib.ClientWrapper.BigData;
 using MineLib.ClientWrapper.Data.Anvil;
+using MineLib.Network.Data;
 using MineLib.Network.Events;
 using MineLib.Network.Packets;
 using MineLib.Network.Packets.Server;
@@ -480,14 +482,27 @@ namespace MineLib.ClientWrapper
             var i = 0;
             foreach (var metadata in MapChunkBulk.MetaInformation)
             {
-                chunks[i] = new Chunk
+                chunks[i] = new Chunk();
+                chunks[i].Coordinates = metadata.Coordinates;
+
+                #region Dumb bugfix for too far chunks
+                var x = (World.ChunkCoordinatesToWorld(metadata.Coordinates).X - Player.Position.Vector3.X);
+                var z = (World.ChunkCoordinatesToWorld(metadata.Coordinates).Z - Player.Position.Vector3.Z);
+
+                if (x >= 700 || z >= 700) // I hope i's just a temporary bugfix.
                 {
-                    Coordinates = metadata.Coordinates,
-                    PrimaryBitMap = metadata.PrimaryBitMap,
-                    AddBitMap = metadata.AddBitMap,
-                    SkyLightSent = metadata.SkyLightSend,
-                    GroundUp = metadata.GroundUp
-                };
+                    // -- Debugging
+                    World.DamagedChunks.Add(MapChunkBulk);
+                    // -- Debugging
+
+                    break; // -- Damaged chunk.
+                }
+                #endregion
+
+                chunks[i].PrimaryBitMap = metadata.PrimaryBitMap;
+                chunks[i].AddBitMap = metadata.AddBitMap;
+                chunks[i].SkyLightSent = metadata.SkyLightSend;
+                chunks[i].GroundUp = metadata.GroundUp;
 
                 DecompressedData = chunks[i].ReadChunkData(DecompressedData);
                 // -- Calls the chunk class to take all of the bytes it needs, and return whats left.

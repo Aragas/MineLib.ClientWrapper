@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using MineLib.ClientWrapper.Data.Anvil;
 using MineLib.Network.Data;
 using MineLib.Network.Enums;
+using MineLib.Network.Packets;
 
 namespace MineLib.ClientWrapper.BigData
 {
@@ -30,6 +31,7 @@ namespace MineLib.ClientWrapper.BigData
     {
         // -- Debugging
         public static List<string> UnsupportedBlockList = new List<string>();
+        public static List<IPacket> DamagedChunks = new List<IPacket>();
         // -- Debugging
 
         public GameMode GameMode;
@@ -85,6 +87,14 @@ namespace MineLib.ClientWrapper.BigData
             var chunkZ = (int)Math.Floor((double)coordinates.Z / Chunk.Depth);
 
             return GetChunk(new Coordinates2D(chunkX, chunkZ));
+        }
+
+        public static Coordinates2D ChunkCoordinatesToWorld(Coordinates2D coordinates)
+        {
+            var chunkX = coordinates.X * Chunk.Width;
+            var chunkZ = coordinates.Z * Chunk.Depth;
+
+            return new Coordinates2D(chunkX, chunkZ);
         }
 
         public Chunk GetChunk(Coordinates2D coordinates)

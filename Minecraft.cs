@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using MineLib.ClientWrapper.BigData;
 using MineLib.Network;
@@ -21,10 +20,13 @@ namespace MineLib.ClientWrapper
             {
                 try
                 {
-                    return Packets.Skip(Math.Max(0, Packets.Count() - 50)).Take(50).ToList();
+                    //return Packets.Skip(Math.Max(0, Packets.Count() - 50)).Take(50).ToList();
+                    return Packets.GetRange(Packets.Count - 50, 50);
                 }
-                catch { }
-                return null;
+                catch
+                {
+                    return null;
+                }
             }
         }
         public IPacket LastPacket { get { return Packets[Packets.Count - 1]; } }
