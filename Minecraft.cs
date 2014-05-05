@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using MineLib.ClientWrapper.BigData;
 using MineLib.Network;
 using MineLib.Network.Enums;
@@ -60,6 +61,8 @@ namespace MineLib.ClientWrapper
 
         public bool Connected { get { return Handler.Connected; }}
 
+        public bool Crashed { get { return Handler.Crashed; } }
+
         public NetworkHandler Handler;
         public PlayerHandler PlayerHandler;
 
@@ -67,6 +70,8 @@ namespace MineLib.ClientWrapper
         public Player Player;
         public Dictionary<int, Entity> Entities;
         public Dictionary<string, short> PlayersList;
+
+        public Thread PlayerHandlerThread;
 
         /// <summary>
         ///     Create a new Minecraft Instance
@@ -83,6 +88,12 @@ namespace MineLib.ClientWrapper
 
             if(VerifyNames)
                 Login();
+        }
+
+        private void HandlePlayer()
+        {
+            PlayerHandler = new PlayerHandler(this);
+            PlayerHandler.Start();
         }
 
         /// <summary>
@@ -112,6 +123,9 @@ namespace MineLib.ClientWrapper
 
             // -- Connect to the server and begin reading packets.
             Handler.Start();
+
+            PlayerHandlerThread = new Thread(HandlePlayer);
+            PlayerHandlerThread.Start();
         }
 
         /// <summary>

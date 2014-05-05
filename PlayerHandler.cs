@@ -1,6 +1,5 @@
 ﻿using System.Threading;
-using MineLib.ClientWrapper.BigData;
-using MineLib.Network;
+using MineLib.Network.Enums;
 using MineLib.Network.Packets.Client;
 
 namespace MineLib.ClientWrapper
@@ -8,14 +7,12 @@ namespace MineLib.ClientWrapper
     // Not used
     public class PlayerHandler
     {
-        private Player _player;
-        private NetworkHandler _network;
+        private Minecraft _minecraft;
         private Timer _timer;
 
-        public PlayerHandler(ref NetworkHandler network, ref Player player)
+        public PlayerHandler(Minecraft minecraft)
         {
-            _network = network;
-            _player = player;
+            _minecraft = minecraft;
         }
 
         public void Start()
@@ -25,7 +22,8 @@ namespace MineLib.ClientWrapper
 
         private void DoTick(object state)
         {
-            _network.Send(new PlayerPacket { OnGround = _player.Position.OnGround });
+            if (_minecraft.State == ServerState.Play)
+                _minecraft.SendPacket(new PlayerPacket { OnGround = _minecraft.Player.Position.OnGround });
             //_network.Send(new PlayerLookPacket { Yaw = 90, Pitch = 50, OnGround = true });
         }
     }
