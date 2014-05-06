@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
+using Ionic.Zlib;
 using MineLib.ClientWrapper.BigData;
 using MineLib.ClientWrapper.Data.Anvil;
-using MineLib.Network.Data;
 using MineLib.Network.Events;
 using MineLib.Network.Packets;
 using MineLib.Network.Packets.Server;
@@ -14,6 +13,7 @@ namespace MineLib.ClientWrapper
     {
         // -- Debugging
         public readonly List<string> ChatHistory = new List<string>();
+        public readonly List<string> PluginMessageUnhandled = new List<string>();
         // -- Debugging
 
         public event PacketsHandler FirePacketHandled;
@@ -423,7 +423,7 @@ namespace MineLib.ClientWrapper
             };
 
             // -- Decompress the data
-            byte[] decompressedData = Decompressor.Decompress(ChunkData.Data);
+            byte[] decompressedData = ZlibStream.UncompressBuffer(ChunkData.Data);
 
             chunk.ReadChunkData(decompressedData);
 
@@ -474,35 +474,22 @@ namespace MineLib.ClientWrapper
 
             var chunks = new Chunk[MapChunkBulk.ChunkColumnCount];
 
-            var DecompressedData = Decompressor.Decompress(MapChunkBulk.ChunkData);
+            byte[] DecompressedData;
 
-            if (World == null)
-                World = new World();
+            try { DecompressedData = ZlibStream.UncompressBuffer(MapChunkBulk.ChunkData); }
+            catch { World.DamagedChunks.Add(MapChunkBulk); return; }
 
             var i = 0;
             foreach (var metadata in MapChunkBulk.MetaInformation)
             {
-                chunks[i] = new Chunk();
-                chunks[i].Coordinates = metadata.Coordinates;
-
-                #region Dumb bugfix for too far chunks
-                var x = (World.ChunkCoordinatesToWorld(metadata.Coordinates).X - Player.Position.Vector3.X);
-                var z = (World.ChunkCoordinatesToWorld(metadata.Coordinates).Z - Player.Position.Vector3.Z);
-
-                if (x >= 700 || z >= 700) // I hope i's just a temporary bugfix.
+                chunks[i] = new Chunk
                 {
-                    // -- Debugging
-                    World.DamagedChunks.Add(MapChunkBulk);
-                    // -- Debugging
-
-                    break; // -- Damaged chunk.
-                }
-                #endregion
-
-                chunks[i].PrimaryBitMap = metadata.PrimaryBitMap;
-                chunks[i].AddBitMap = metadata.AddBitMap;
-                chunks[i].SkyLightSent = metadata.SkyLightSend;
-                chunks[i].GroundUp = metadata.GroundUp;
+                    Coordinates = metadata.Coordinates,
+                    PrimaryBitMap = metadata.PrimaryBitMap,
+                    AddBitMap = metadata.AddBitMap,
+                    SkyLightSent = metadata.SkyLightSend,
+                    GroundUp = metadata.GroundUp
+                };
 
                 DecompressedData = chunks[i].ReadChunkData(DecompressedData);
                 // -- Calls the chunk class to take all of the bytes it needs, and return whats left.
@@ -664,6 +651,7 @@ namespace MineLib.ClientWrapper
                     break;
 
                 default:
+                    PluginMessageUnhandled.Add(PluginMessage.Channel + " : " + Encoding.UTF8.GetString(PluginMessage.Data));
                     break;
             }
         }

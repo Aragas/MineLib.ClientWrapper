@@ -6,12 +6,13 @@ namespace MineLib.ClientWrapper.Data.Anvil
     // This class don't use RawData in any way. Only Blocks. I mean hash and other stuff.
     public class Section
     {
-        public const byte Width = 16, Height = 16, Depth = 16;
+        public const int Width = 16, Height = 16, Depth = 16;
 
         public byte[] RawBlocks;
         public byte[] RawMetadata;
         public byte[] RawBlockLight;
         public byte[] RawSkylight;
+        public byte[] RawAddBlock;
         public byte Y;
 
         public Block[] Blocks;
@@ -57,8 +58,8 @@ namespace MineLib.ClientWrapper.Data.Anvil
             var index = GetIndex(coordinates);
 
             var block = Blocks[index];
-            Blocks[index].Coordinates = coordinates;
-            Blocks[index].Chunk = new Coordinates2D
+            Blocks[index].BlockCoordinates = coordinates;
+            Blocks[index].ChunkCoordinates = new Coordinates2D
             {
                 X = (int) Math.Floor(decimal.Divide(coordinates.X, 16)),
                 Z = (int) Math.Floor(decimal.Divide(coordinates.Z, 16))
@@ -69,7 +70,7 @@ namespace MineLib.ClientWrapper.Data.Anvil
 
         public void SetBlock(Coordinates3D coordinates, Block block)
         {
-            var index = GetIndex(coordinates);
+            var index = GetIndex(coordinates); // bug: could be negative values
 
             Blocks[index] = block;
         }
