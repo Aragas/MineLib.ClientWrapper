@@ -7,22 +7,24 @@ namespace MineLib.ClientWrapper.Data.Anvil
     // Get Block methods
     public partial class Block
     {
+        // -- Mostly used for better debug reading, cause performance loss.
+        // -- Better use only ID and Metadata for handling.
         public static string GetName(int id, int meta = 0)
         {
-            foreach (var blockNew in List)
+            foreach (var block in List)
             {
-                if (blockNew.Id == id && blockNew.Meta == meta)
-                    return blockNew.Name;
+                if (block.Id == id && block.Meta == meta)
+                    return block.Name;
             }
             return null;
         }
 
         public static Block GetBlock(int id, int meta = 0)
         {
-            foreach (var blockNew in List)
+            foreach (var block in List)
             {
-                if (blockNew.Id == id && blockNew.Meta == meta)
-                    return blockNew;
+                if (block.Id == id && block.Meta == meta)
+                    return block;
             }
 
             // -- Debugging
@@ -379,17 +381,15 @@ namespace MineLib.ClientWrapper.Data.Anvil
     // Block data
     public partial class Block
     {
-        public string Name;
-
         public int Id;
         public int Meta;
-
-        public Coordinates3D Coordinates;
-        public Coordinates2D Chunk;
-
+        public string Name;
+        public Coordinates2D ChunkCoordinates;
+        public Coordinates3D BlockCoordinates;
 
         public Block()
-        { 
+            : this(0, 0, null)
+        {
         }
 
         public Block(int id, string name)
@@ -402,6 +402,8 @@ namespace MineLib.ClientWrapper.Data.Anvil
             Name = name;
             Id = id;
             Meta = meta;
+            BlockCoordinates = Coordinates3D.Zero;
+            ChunkCoordinates = Coordinates2D.Zero;
         }
 
         public override string ToString()

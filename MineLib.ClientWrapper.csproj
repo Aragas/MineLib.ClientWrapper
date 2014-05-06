@@ -73,6 +73,10 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ionic.Zip.Reduced, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libraries\Ionic.Zip.Reduced.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Network\Libraries\Newtonsoft.Json.dll</HintPath>
@@ -91,7 +95,6 @@
     <Compile Include="BigData\Vehicle.cs" />
     <Compile Include="BigData\World.cs" />
     <Compile Include="Data\Anvil\Block.cs" />
-    <Compile Include="Data\Anvil\Decompressor.cs" />
     <Compile Include="Data\Anvil\Chunk.cs" />
     <Compile Include="Data\Anvil\Section.cs" />
     <Compile Include="Minecraft.Classic.cs" />
@@ -110,6 +113,10 @@
       <Name>MineLib.Network</Name>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Libraries\Ionic.Zip.Reduced.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>

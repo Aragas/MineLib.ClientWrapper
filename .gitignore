@@ -111,3 +111,4 @@ MineLib.GraphicClient/Icon.ico
 MineLib.GraphicClient/MineLib.GraphicClient.csproj
 MineLib.GraphicClient/Program.cs
 MineLib.GraphicClient/Properties/AssemblyInfo.cs
+!Ionic.Zip.Reduced.dll

@@ -6,7 +6,6 @@ namespace MineLib.ClientWrapper.Data.Anvil
 {
     public class Chunk
     {
-
         public const int Width = 16, Height = 256, Depth = 16;
 
         private const int BlockDataLength = Section.Width * Section.Depth * Section.Height;
@@ -61,6 +60,8 @@ namespace MineLib.ClientWrapper.Data.Anvil
             {
                 if ((PrimaryBitMap & (1 << y)) > 0)
                 {
+                    var add = (AddBitMap & (1 << y)) > 0;
+
                     // Blocks
                     Array.Copy(data, y * BlockDataLength, Sections[y].RawBlocks, 0, BlockDataLength);
 
@@ -84,6 +85,16 @@ namespace MineLib.ClientWrapper.Data.Anvil
                             ((BlockDataLength + NibbleDataLength + NibbleDataLength) * sectionCount) +
                             (y * NibbleDataLength), nibbleSkyLight, 0, NibbleDataLength);
                         Sections[y].RawSkylight = CreateMetadataBytes(nibbleSkyLight); // Convert half-byte to one-byte.
+                    }
+
+                    // AddBlocks
+                    if (add)
+                    {
+                        var nibbleAddBlock = new byte[2048];
+                        Array.Copy(data,
+                            ((BlockDataLength + NibbleDataLength + NibbleDataLength + NibbleDataLength) * sectionCount) +
+                            (y * NibbleDataLength), nibbleAddBlock, 0, NibbleDataLength);
+                        Sections[y].RawAddBlock = CreateMetadataBytes(nibbleAddBlock); // Convert half-byte to one-byte.
                     }
 
                     Sections[y].FillBlocks();
