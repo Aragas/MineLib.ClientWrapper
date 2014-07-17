@@ -64,7 +64,7 @@ namespace MineLib.ClientWrapper
         public bool Crashed { get { return Handler.Crashed; } }
 
         public NetworkHandler Handler;
-        public PlayerHandler PlayerHandler;
+        public PlayerTickHandler PlayerHandler;
 
         public World World;
         public Player Player;
@@ -90,9 +90,9 @@ namespace MineLib.ClientWrapper
                 Login();
         }
 
-        private void HandlePlayer()
+        private void StartPlayerTickHandler()
         {
-            PlayerHandler = new PlayerHandler(this);
+            PlayerHandler = new PlayerTickHandler(this);
             PlayerHandler.Start();
         }
 
@@ -124,8 +124,9 @@ namespace MineLib.ClientWrapper
             // -- Connect to the server and begin reading packets.
             Handler.Start();
 
-            PlayerHandlerThread = new Thread(HandlePlayer);
-            PlayerHandlerThread.Start();
+            //PlayerHandlerThread = new Thread(HandlePlayer) { Name = "PlayerTickHandler"};
+            //PlayerHandlerThread.Start();
+            StartPlayerTickHandler();
         }
 
         /// <summary>

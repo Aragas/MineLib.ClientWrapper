@@ -112,7 +112,6 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Content Include="Libraries\Ionic.Zip.Reduced.dll" />
   </ItemGroup>

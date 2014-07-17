@@ -5,12 +5,12 @@ using MineLib.Network.Packets.Client;
 namespace MineLib.ClientWrapper
 {
     // Not used
-    public class PlayerHandler
+    public class PlayerTickHandler
     {
         private Minecraft _minecraft;
         private Timer _timer;
 
-        public PlayerHandler(Minecraft minecraft)
+        public PlayerTickHandler(Minecraft minecraft)
         {
             _minecraft = minecraft;
         }
@@ -24,6 +24,7 @@ namespace MineLib.ClientWrapper
         {
             if (_minecraft.State == ServerState.Play)
                 _minecraft.SendPacket(new PlayerPacket { OnGround = _minecraft.Player.Position.OnGround });
+
             //_network.Send(new PlayerLookPacket { Yaw = 90, Pitch = 50, OnGround = true });
         }
     }
