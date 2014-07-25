@@ -37,7 +37,10 @@ namespace MineLib.ClientWrapper
 
         public string AccessToken { get; set; }
 
-        public string ClientName { get; set; }
+        public string ClientLogin { get; set; }
+
+        private string _clientUsername;
+        public string ClientUsername { get { return _clientUsername ?? ClientLogin; } }
 
         public string ClientToken { get; set; }
 
@@ -45,13 +48,13 @@ namespace MineLib.ClientWrapper
 
         public string ClientPassword { get; set; }
 
-        public string ClientBrand { get; set; }
+        public string ClientBrand { get { return "MineLib.Net";} }
 
         public string ServerBrand { get; set; }
 
         public bool VerifyNames { get; set; }
 
-        public string ServerIP { get; set; }
+        public string ServerHost { get; set; }
 
         public short ServerPort { get; set; }
 
@@ -76,15 +79,14 @@ namespace MineLib.ClientWrapper
         /// <summary>
         ///     Create a new Minecraft Instance
         /// </summary>
-        /// <param name="username">The username to use when connecting to Minecraft</param>
+        /// <param name="login">The username to use when connecting to Minecraft</param>
         /// <param name="password">The password to use when connecting to Minecraft (Ignore if you are providing credentials)</param>
         /// <param name="nameVerification">To connect using Name Verification or not</param>
-        public Minecraft(string username, string password, bool nameVerification = false)
+        public Minecraft(string login, string password, bool nameVerification = false)
         {
-            ClientName = username;
+            ClientLogin = login;
             ClientPassword = password;
             VerifyNames = nameVerification;
-            ClientBrand = "MineLib.Net"; // -- Used in the plugin message reporting the client brand to the server.
 
             if(VerifyNames)
                 Login();
@@ -103,7 +105,7 @@ namespace MineLib.ClientWrapper
         /// <param name="port">The port of the server to connect to</param>
         public void Connect(string ip, short port)
         {
-            ServerIP = ip;
+            ServerHost = ip;
             ServerPort = port;
 
             if (Handler != null)

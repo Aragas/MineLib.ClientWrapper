@@ -54,6 +54,42 @@ namespace MineLib.ClientWrapper.Data.Anvil
         {
             var sectionCount = GetSectionCount(PrimaryBitMap);
 
+
+            // Run through the sections
+            // TODO: Support block IDs >255
+            for (int y = 0; y < 16; y++)
+            {
+                if ((PrimaryBitMap & (1 << y)) > 0)
+                {
+                    var addArray = (AddBitMap & (1 << y)) > 0;
+
+                    // Blocks
+                    Array.Copy(data, y * BlockDataLength, Sections[y].RawBlocks, 0, BlockDataLength);
+                    // Metadata
+                    Array.Copy(data, (BlockDataLength * y) + (y * NibbleDataLength), Sections[y].RawMetadata, 0, NibbleDataLength);
+                    // Light
+                    Array.Copy(data, ((BlockDataLength + NibbleDataLength) * y) + (y * NibbleDataLength), Sections[y].RawBlockLight, 0, NibbleDataLength);
+                    // Sky light
+                    if (SkyLightSent)
+                    {
+                        Array.Copy(data, ((BlockDataLength + NibbleDataLength + NibbleDataLength) * y) + (y * NibbleDataLength), Sections[y].RawSkylight, 0, NibbleDataLength);
+                    }
+
+                    // AddBlocks
+                    if (addArray)
+                    {
+                        Array.Copy(data, ((BlockDataLength + NibbleDataLength + NibbleDataLength + NibbleDataLength) * y) + (y * NibbleDataLength), Sections[y].RawAddBlock, 0, NibbleDataLength);
+                    }
+
+                    Sections[y].FillBlocks();
+                }
+            }
+            if (GroundUp)
+                Array.Copy(data, data.Length - Biomes.Length, Biomes, 0, Biomes.Length);
+
+
+            /*
+
             // Run through the sections
             // TODO: Support block IDs >255
             for (var y = 0; y < 16; y++)
@@ -103,13 +139,14 @@ namespace MineLib.ClientWrapper.Data.Anvil
             if (GroundUp)
                 Array.Copy(data, data.Length - Biomes.Length, Biomes, 0, Biomes.Length);
 
+            */
+
         }
 
         public byte[] ReadChunkData(byte[] deCompressed)
         {
-            var chunkLength = (BlockDataLength + (NibbleDataLength * 2) + (SkyLightSent ? NibbleDataLength : 0)) *
-                    GetSectionCount(PrimaryBitMap) +
-                        NibbleDataLength * GetSectionCount(AddBitMap) + (Width * Depth);
+            var chunkLength =
+                (BlockDataLength + NibbleDataLength + NibbleDataLength + (SkyLightSent ? NibbleDataLength : 0)) * GetSectionCount(PrimaryBitMap) + NibbleDataLength * GetSectionCount(AddBitMap) + 256;
 
             var chunkData = new byte[chunkLength];
             Array.Copy(deCompressed, 0, chunkData, 0, chunkLength);

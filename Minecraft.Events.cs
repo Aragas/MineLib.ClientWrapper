@@ -431,7 +431,7 @@ namespace MineLib.ClientWrapper
             World.SetChunk(chunk);     
         }
 
-        private void OnMultiBlockChange(IPacket packet) // -- Works
+        private void OnMultiBlockChange(IPacket packet) // Bug: Nope
         {
             var MultiBlockChange = (MultiBlockChangePacket)packet;
             for (var i = 0; i < MultiBlockChange.RecordCount; i++)
@@ -441,12 +441,13 @@ namespace MineLib.ClientWrapper
                     Id = MultiBlockChange.RecordsArray[i].BlockID,
                     Meta = MultiBlockChange.RecordsArray[i].Metadata,
                 };
-                World.SetBlock(MultiBlockChange.RecordsArray[i].Coordinates, block);
+
+                //World.SetBlock(MultiBlockChange.RecordsArray[i].Coordinates, block);
             }
            
         }
 
-        private void OnBlockChange(IPacket packet) // -- Works
+        private void OnBlockChange(IPacket packet) // Bug: Nope
         {
             var BlockChange = (BlockChangePacket) packet;
 
@@ -457,7 +458,7 @@ namespace MineLib.ClientWrapper
                 Name = Block.GetName(BlockChange.BlockID, BlockChange.BlockMetadata)
             };
 
-            World.SetBlock(BlockChange.Coordinates, data);
+            //World.SetBlock(BlockChange.Coordinates, data);
         }
 
         private void OnBlockAction(IPacket packet)
@@ -468,16 +469,17 @@ namespace MineLib.ClientWrapper
         {
         }
 
-        private void OnMapChunkBulk(IPacket packet) // -- Works in Online mode, bug in Pirate mode
+        private void OnMapChunkBulk(IPacket packet) //Bug: Nope
         {
+            /*
             var MapChunkBulk = (MapChunkBulkPacket) packet;
 
             var chunks = new Chunk[MapChunkBulk.ChunkColumnCount];
 
-            byte[] DecompressedData;
+            byte[] decompressedData = ZlibStream.UncompressBuffer(MapChunkBulk.ChunkData);
 
-            try { DecompressedData = ZlibStream.UncompressBuffer(MapChunkBulk.ChunkData); }
-            catch { World.DamagedChunks.Add(MapChunkBulk); return; }
+            //try { DecompressedData = ZlibStream.UncompressBuffer(MapChunkBulk.ChunkData); }
+            //catch { World.DamagedChunks.Add(MapChunkBulk); return; }
 
             var i = 0;
             foreach (var metadata in MapChunkBulk.MetaInformation)
@@ -491,12 +493,13 @@ namespace MineLib.ClientWrapper
                     GroundUp = metadata.GroundUp
                 };
 
-                DecompressedData = chunks[i].ReadChunkData(DecompressedData);
+                decompressedData = chunks[i].ReadChunkData(decompressedData);
                 // -- Calls the chunk class to take all of the bytes it needs, and return whats left.
 
                 World.SetChunk(chunks[i]);
                 i++;
             }
+            */
         }
 
         private void OnExplosion(IPacket packet)

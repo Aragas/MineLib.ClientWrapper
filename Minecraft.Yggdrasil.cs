@@ -11,13 +11,14 @@ namespace MineLib.ClientWrapper
         {
             if (VerifyNames)
             {
-                var result = Yggdrasil.Login(ClientName, ClientPassword);
+                var result = Yggdrasil.Login(ClientLogin, ClientPassword);
 
                 switch (result.Status)
                 {
                     case YggdrasilStatus.Success:
                         AccessToken = result.Response.AccessToken;
                         ClientToken = result.Response.ClientToken;
+                        _clientUsername = result.Response.Profile.Name;
                         SelectedProfile = result.Response.Profile.ID;
                         break;
 
@@ -76,7 +77,7 @@ namespace MineLib.ClientWrapper
             if (!VerifyNames)
                 return false;
 
-            return Yggdrasil.Logout(ClientName, ClientPassword);
+            return Yggdrasil.Logout(ClientLogin, ClientPassword);
         }
 
     }
