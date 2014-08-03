@@ -1,6 +1,6 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/yna4yfopgnaei1kg)](https://ci.appveyor.com/project/Aragas/minelib-clientwrapper)
+[![Build status](https://ci.appveyor.com/api/projects/status/kocrbujr1rws3dy6)](https://ci.appveyor.com/project/Aragas/minelib-clientwrapper)
 
-MineLib.Wrapper
+MineLib.ClientWrapper
 ===============
 
 Wrapper for Network
