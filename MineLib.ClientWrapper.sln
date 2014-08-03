@@ -5,50 +5,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineLib.ClientWrapper", "Mi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineLib.Network", "Network\MineLib.Network.csproj", "{E7C8320E-49A4-4187-AFE3-15C814201E1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MineLib.GraphicClient", "MineLib.GraphicClient\MineLib.GraphicClient.csproj", "{2E9DEF03-8011-43A3-AE1F-E863C72043F8}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{CE1D9FC2-2CBF-432F-9BA6-69D79CF870EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CE1D9FC2-2CBF-432F-9BA6-69D79CF870EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CE1D9FC2-2CBF-432F-9BA6-69D79CF870EA}.Debug|x64.ActiveCfg = Debug|x64
-		{CE1D9FC2-2CBF-432F-9BA6-69D79CF870EA}.Debug|x64.Build.0 = Debug|x64
-		{CE1D9FC2-2CBF-432F-9BA6-69D79CF870EA}.Debug|x86.ActiveCfg = Debug|x86
-		{CE1D9FC2-2CBF-432F-9BA6-69D79CF870EA}.Debug|x86.Build.0 = Debug|x86
 		{CE1D9FC2-2CBF-432F-9BA6-69D79CF870EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CE1D9FC2-2CBF-432F-9BA6-69D79CF870EA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CE1D9FC2-2CBF-432F-9BA6-69D79CF870EA}.Release|x64.ActiveCfg = Release|x64
-		{CE1D9FC2-2CBF-432F-9BA6-69D79CF870EA}.Release|x64.Build.0 = Release|x64
-		{CE1D9FC2-2CBF-432F-9BA6-69D79CF870EA}.Release|x86.ActiveCfg = Release|x86
-		{CE1D9FC2-2CBF-432F-9BA6-69D79CF870EA}.Release|x86.Build.0 = Release|x86
 		{E7C8320E-49A4-4187-AFE3-15C814201E1E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E7C8320E-49A4-4187-AFE3-15C814201E1E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E7C8320E-49A4-4187-AFE3-15C814201E1E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{E7C8320E-49A4-4187-AFE3-15C814201E1E}.Debug|x64.Build.0 = Debug|Any CPU
-		{E7C8320E-49A4-4187-AFE3-15C814201E1E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{E7C8320E-49A4-4187-AFE3-15C814201E1E}.Debug|x86.Build.0 = Debug|Any CPU
 		{E7C8320E-49A4-4187-AFE3-15C814201E1E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7C8320E-49A4-4187-AFE3-15C814201E1E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E7C8320E-49A4-4187-AFE3-15C814201E1E}.Release|x64.ActiveCfg = Release|Any CPU
-		{E7C8320E-49A4-4187-AFE3-15C814201E1E}.Release|x64.Build.0 = Release|Any CPU
-		{E7C8320E-49A4-4187-AFE3-15C814201E1E}.Release|x86.ActiveCfg = Release|Any CPU
-		{E7C8320E-49A4-4187-AFE3-15C814201E1E}.Release|x86.Build.0 = Release|Any CPU
-		{2E9DEF03-8011-43A3-AE1F-E863C72043F8}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{2E9DEF03-8011-43A3-AE1F-E863C72043F8}.Debug|x64.ActiveCfg = Debug|x86
-		{2E9DEF03-8011-43A3-AE1F-E863C72043F8}.Debug|x86.ActiveCfg = Debug|x86
-		{2E9DEF03-8011-43A3-AE1F-E863C72043F8}.Debug|x86.Build.0 = Debug|x86
-		{2E9DEF03-8011-43A3-AE1F-E863C72043F8}.Release|Any CPU.ActiveCfg = Release|x86
-		{2E9DEF03-8011-43A3-AE1F-E863C72043F8}.Release|x64.ActiveCfg = Release|x86
-		{2E9DEF03-8011-43A3-AE1F-E863C72043F8}.Release|x86.ActiveCfg = Release|x86
-		{2E9DEF03-8011-43A3-AE1F-E863C72043F8}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
