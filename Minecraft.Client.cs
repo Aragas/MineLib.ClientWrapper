@@ -81,12 +81,12 @@ namespace MineLib.ClientWrapper
         }
 
 
-        private void PlaySound(string soundName, Coordinates3D coordinates,
+        private void PlaySound(string soundName, Position coordinates,
             float volume, byte pitch)
         {
         }
 
-        private void PlayEffect(EffectID effectId, Coordinates3D coordinates,
+        private void PlayEffect(EffectID effectId, Position coordinates,
             int data, bool disableRelativeVolume)
         {
         }
@@ -98,7 +98,7 @@ namespace MineLib.ClientWrapper
             ChatTextHistory.Add(Text);
         }
 
-        private void EditSign(Coordinates3D coordinates)
+        private void EditSign(Position coordinates)
         {
         }
     }

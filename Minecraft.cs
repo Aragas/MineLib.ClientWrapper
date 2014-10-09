@@ -10,7 +10,7 @@ using MineLib.Network.Packets.Client;
 namespace MineLib.ClientWrapper
 {
     /// <summary>
-    ///     Wrapper for Network of MineLib.Net.
+    /// Wrapper for Network of MineLib.Net.
     /// </summary>
     public partial class Minecraft : IMinecraftClient, IDisposable
     {
@@ -19,18 +19,11 @@ namespace MineLib.ClientWrapper
         {
             get
             {
-                try
-                {
-                    //return Packets.Skip(Math.Max(0, Packets.Count() - 50)).Take(50).ToList();
-                    return Packets.GetRange(Packets.Count - 50, 50);
-                }
-                catch
-                {
-                    return null;
-                }
+                try { return Handler.PacketsReceived.GetRange(Handler.PacketsReceived.Count - 50, 50); }
+                catch { return null; }
             }
         }
-        public IPacket LastPacket { get { return Packets[Packets.Count - 1]; } }
+        public IPacket LastPacket { get { return Handler.PacketsReceived[Handler.PacketsReceived.Count - 1]; } }
         // -- Debugging
 
         #region Variables
@@ -66,6 +59,8 @@ namespace MineLib.ClientWrapper
 
         public bool Crashed { get { return Handler.Crashed; } }
 
+        public bool ReducedDebugInfo;
+
         public NetworkHandler Handler;
         public PlayerTickHandler PlayerHandler;
 
@@ -77,7 +72,7 @@ namespace MineLib.ClientWrapper
         public Thread PlayerHandlerThread;
 
         /// <summary>
-        ///     Create a new Minecraft Instance
+        /// Create a new Minecraft Instance
         /// </summary>
         /// <param name="login">The username to use when connecting to Minecraft</param>
         /// <param name="password">The password to use when connecting to Minecraft (Ignore if you are providing credentials)</param>
@@ -99,7 +94,7 @@ namespace MineLib.ClientWrapper
         }
 
         /// <summary>
-        ///     Connects to the Minecraft Server.
+        /// Connects to the Minecraft Server.
         /// </summary>
         /// <param name="ip">The IP of the server to connect to</param>
         /// <param name="port">The port of the server to connect to</param>
@@ -128,11 +123,10 @@ namespace MineLib.ClientWrapper
 
             //PlayerHandlerThread = new Thread(HandlePlayer) { Name = "PlayerTickHandler"};
             //PlayerHandlerThread.Start();
-            StartPlayerTickHandler();
         }
 
         /// <summary>
-        ///     Send IPacket to the Minecraft Server.
+        /// Send IPacket to the Minecraft Server.
         /// </summary>
         /// <param name="packet">IPacket to sent to server</param>
         public void SendPacket(IPacket packet)
@@ -148,7 +142,7 @@ namespace MineLib.ClientWrapper
         }
 
         /// <summary>
-        ///     Disconnects from the Minecraft server.
+        /// Disconnects from the Minecraft server.
         /// </summary>
         public void Disconnect()
         {

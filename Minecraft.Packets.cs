@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using MineLib.Network.Enums;
 using MineLib.Network.Packets;
 
@@ -7,17 +6,11 @@ namespace MineLib.ClientWrapper
 {
     public partial class Minecraft
     {
-        // -- Debugging
-        public readonly List<IPacket> Packets = new List<IPacket>();
-        // -- Debugging
-
         private void RaisePacketHandled(IPacket packet, int id, ServerState? state)
         {
             // -- Debugging
             Console.WriteLine("ID: 0x" + String.Format("{0:X}", id));
             Console.WriteLine(" ");
-            Packets.Add(packet);
-            // -- Debugging
 
             switch (state)
             {

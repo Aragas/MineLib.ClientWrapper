@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using MineLib.Network.Data;
-using MineLib.Network.Data.EntityMetadata;
 using MineLib.Network.Enums;
+using Org.BouncyCastle.Math;
 
 namespace MineLib.ClientWrapper.BigData
 {
@@ -10,7 +10,9 @@ namespace MineLib.ClientWrapper.BigData
     {
         public int EntityID;
 
-        public MetadataDictionary Metadata;
+        public Mobs Type;
+
+        public EntityMetadata Metadata;
 
         public EntityPlayer Player;
 
@@ -19,7 +21,7 @@ namespace MineLib.ClientWrapper.BigData
         public Vector3 Position;
         public EntityLook Look;
 
-        public Coordinates3D Bed;
+        public Position Bed;
 
         public EntityStatus Status;
         public EntityEquipment Equipment;
@@ -28,30 +30,34 @@ namespace MineLib.ClientWrapper.BigData
 
         public List<EntityEffect> Effects;
 
-        public EntityProperty[] Properties;
+        public EntityPropertyList Properties;
 
         public Vehicle Vehicle;
 
         public bool Leash;
 
+        public bool OnGround;
+
         public Entity()
         {
-            Metadata = new MetadataDictionary();
+            Metadata = new EntityMetadata();
             Vehicle = new Vehicle();
             Effects = new List<EntityEffect>();
+
+            OnGround = false;
         }
 
         public Entity(int id)
         {
             EntityID = id;
-            Metadata = new MetadataDictionary();
+            Metadata = new EntityMetadata();
             Vehicle = new Vehicle();
             Effects = new List<EntityEffect>();
         }
 
         public bool IsPlayer
         {
-            get { return Player.Name != null && Player.UUID != null; }
+            get { return Player.UUID != null && Player.UUID != null; }
         }
 
         public static Vector3 ToVector3(byte yaw, byte pitch)
@@ -86,20 +92,23 @@ namespace MineLib.ClientWrapper.BigData
     public struct EntityEffect
     {
         public EffectID EffectID;
-        public byte Amplifier;
-        public short Duration;
+        public sbyte Amplifier;
+        public int Duration;
+        public bool HideParticle;
     }
 
     public struct EntityPlayer
     {
-        public string UUID;
-        public string Name;
+        public BigInteger UUID;
+        //public string Name;
     }
 
     public struct EntityLook
     {
-        public byte Yaw;
-        public byte Pitch;
+        public sbyte Yaw;
+        public sbyte HeadYaw;
+        public sbyte Pitch;
+        public sbyte HeadPitch;
     }
 
     public struct EntityVelocity

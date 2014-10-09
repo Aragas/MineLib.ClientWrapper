@@ -23,7 +23,8 @@ namespace MineLib.ClientWrapper
         private void DoTick(object state)
         {
             if (_minecraft.State == ServerState.Play)
-                _minecraft.SendPacket(new PlayerPacket { OnGround = _minecraft.Player.Position.OnGround });
+                //_minecraft.SendPacket(new PlayerPacket { OnGround = _minecraft.Player.Position.OnGround });
+                _minecraft.SendPacket(new PlayerPacket { OnGround = true });
 
             //_network.Send(new PlayerLookPacket { Yaw = 90, Pitch = 50, OnGround = true });
         }

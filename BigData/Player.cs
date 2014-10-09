@@ -19,9 +19,9 @@ namespace MineLib.ClientWrapper.BigData
         public PlayerHealth Health;
         public PlayerExperience Experience;
         public PlayerItems Items;
-        public byte HeldItem;
+        public sbyte HeldItem;
 
-        public PlayerStatistics Statistics;
+        public StatisticsEntryList Statistics;
 
         public PlayerScoreboardObjective ScoreboardObjective;
 
@@ -34,21 +34,21 @@ namespace MineLib.ClientWrapper.BigData
             Windows = new List<PlayerWindow>();
         }
 
-        public void SetWindowItems(byte windowId, ItemStack[] slotData)
+        public void SetWindowItems(byte windowId, ItemStackList slotData)
         {
             if (Items.WindowId == windowId)
                 Items.SlotData = slotData;
         }
 
-        public void SetSlot(byte windowId, short slot, ItemStack slotData)
+        public void SetSlot(sbyte windowId, short slot, ItemStack slotData)
         {
             if (Items.WindowId == windowId)
                 Items.SlotData[slot] = slotData;
 
         }
 
-        public void OpenWindow(byte windowId, byte inventoryType, string windowTitle, byte numberOfSlots,
-            bool useProvidedWindowTitle, int? entityID = 0)
+        public void OpenWindow(byte windowId, string inventoryType, string windowTitle, byte numberOfSlots,
+            int? entityID = 0)
         {
         }
 
@@ -64,7 +64,7 @@ namespace MineLib.ClientWrapper.BigData
 
     public struct PlayerAbilities
     {
-        public byte Flags;
+        public sbyte Flags;
         public bool DamageDisabled { get { return Convert.ToBoolean((Flags >> 3) & 1); } }
         public bool CanFly { get { return Convert.ToBoolean((Flags >> 2) & 1); } }
         public bool IsFlying { get { return Convert.ToBoolean((Flags >> 1) & 1); } }
@@ -89,21 +89,21 @@ namespace MineLib.ClientWrapper.BigData
     public struct PlayerHealth
     {
         public float Health;
-        public short Food;
+        public int Food;
         public float FoodSaturation;
     }
 
     public struct PlayerExperience
     {
         public float ExperienceBar;
-        public short Level;
-        public short TotalExperience;
+        public int Level;
+        public int TotalExperience;
     }
 
     public struct PlayerItems
     {
         public byte WindowId;
-        public ItemStack[] SlotData;
+        public ItemStackList SlotData;
     }
 
     public struct PlayerStatistics
@@ -125,8 +125,9 @@ namespace MineLib.ClientWrapper.BigData
     public struct PlayerEffect
     {
         public EffectID EffectID;
-        public byte Amplifier;
-        public short Duration;
+        public sbyte Amplifier;
+        public int Duration;
+        public bool HideParticle;
     }
 
     public struct PlayerWindow

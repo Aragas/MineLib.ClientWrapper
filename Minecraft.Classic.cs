@@ -11,7 +11,6 @@ namespace MineLib.ClientWrapper
             // -- Debugging
             Console.WriteLine("ID: 0x" + String.Format("{0:X}", id));
             Console.WriteLine(" ");
-            Packets.Add(packet);
             // -- Debugging
         }
     }

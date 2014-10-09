@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using Ionic.Zlib;
 using MineLib.ClientWrapper.BigData;
-using MineLib.ClientWrapper.Data.Anvil;
+using MineLib.Network.Data.Anvil;
 using MineLib.Network.Events;
 using MineLib.Network.Packets;
 using MineLib.Network.Packets.Server;
@@ -20,210 +19,223 @@ namespace MineLib.ClientWrapper
 
         #region Voids
 
-        private void OnKeepAlive(IPacket packet)
+        private void OnKeepAlive(IPacket packet) // -- Works
         {
-            var KeepAlive = (KeepAlivePacket) packet;
+            var keepAlive = (KeepAlivePacket) packet;
 
-            SendPacket(KeepAlive);
+            SendPacket(keepAlive);
         }
 
-        private void OnJoinGame(IPacket packet)
+        private void OnJoinGame(IPacket packet) // -- Works
         {
-            var JoinGame = (JoinGamePacket) packet;
+            var joinGame = (JoinGamePacket) packet;
 
-            Player.EntityID = JoinGame.EntityID;
+            Player.EntityID = joinGame.EntityID;
 
-            World.Difficulty = JoinGame.Difficulty;
-            World.Dimension = JoinGame.Dimension;
-            World.GameMode = JoinGame.GameMode;
-            World.LevelType = JoinGame.LevelType;
-            World.MaxPlayers = JoinGame.MaxPlayers;
+            World.Difficulty = joinGame.Difficulty;
+            World.Dimension = joinGame.Dimension;
+            World.GameMode = joinGame.GameMode;
+            World.LevelType = joinGame.LevelType;
+            World.MaxPlayers = joinGame.MaxPlayers;
+
+            ReducedDebugInfo = joinGame.ReducedDebugInfo;
         }
 
         private void OnChatMessage(IPacket packet)
         {
-            var ChatMessage = (ChatMessagePacket) packet;
+            var chatMessage = (ChatMessagePacket) packet;
 
             // -- Debugging
-            ChatHistory.Add(ChatMessage.Message);
+            ChatHistory.Add(chatMessage.Message);
             // -- Debugging
 
-            DisplayChatMessage(ChatMessage.Message);
+            DisplayChatMessage(chatMessage.Message);
         }
 
-        private void OnTimeUpdate(IPacket packet)
+        private void OnTimeUpdate(IPacket packet) // -- Works
         {
-            var TimeUpdate = (TimeUpdatePacket) packet;
+            var timeUpdate = (TimeUpdatePacket) packet;
 
-            World.AgeOfTheWorld = TimeUpdate.AgeOfTheWorld;
-            World.TimeOfDay = TimeUpdate.TimeOfDay;
+            World.AgeOfTheWorld = timeUpdate.AgeOfTheWorld;
+            World.TimeOfDay = timeUpdate.TimeOfDay;
         }
 
         private void OnEntityEquipment(IPacket packet)
         {
-            var EntityEquipment = (EntityEquipmentPacket) packet;
+            var entityEquipment = (EntityEquipmentPacket) packet;
 
-            if (!Entities.ContainsKey(EntityEquipment.EntityID))
-                Entities.Add(EntityEquipment.EntityID, new Entity {EntityID = EntityEquipment.EntityID});
+            if (!Entities.ContainsKey(entityEquipment.EntityID))
+                Entities.Add(entityEquipment.EntityID, new Entity { EntityID = entityEquipment.EntityID });
 
-            Entities[EntityEquipment.EntityID].Equipment.Item = EntityEquipment.Item;
-            Entities[EntityEquipment.EntityID].Equipment.Slot = EntityEquipment.Slot;
+            Entities[entityEquipment.EntityID].Equipment.Item = entityEquipment.Item;
+            Entities[entityEquipment.EntityID].Equipment.Slot = entityEquipment.Slot;
         }
 
-        private void OnSpawnPosition(IPacket packet)
+        private void OnSpawnPosition(IPacket packet) // -- Works
         {
-            var SpawnPosition = (SpawnPositionPacket) packet;
+            var spawnPosition = (SpawnPositionPacket) packet;
 
-            World.SpawnPosition = SpawnPosition.Coordinates;
+            World.SpawnPosition = spawnPosition.Location;
         }
 
-        private void OnUpdateHealth(IPacket packet)
+        private void OnUpdateHealth(IPacket packet) // -- Works
         {
-            var UpdateHealth = (UpdateHealthPacket) packet;
+            var updateHealth = (UpdateHealthPacket) packet;
 
-            Player.Health.Food = UpdateHealth.Food;
-            Player.Health.FoodSaturation = UpdateHealth.FoodSaturation;
-            Player.Health.Health = UpdateHealth.Health;
+            Player.Health.Food = updateHealth.Food;
+            Player.Health.FoodSaturation = updateHealth.FoodSaturation;
+            Player.Health.Health = updateHealth.Health;
         }
 
-        private void OnRespawn(IPacket packet)
+        private bool playerstarted = false;
+        private void OnRespawn(IPacket packet) // -- Works
         {
-            var Respawn = (RespawnPacket) packet;
+            var respawn = (RespawnPacket) packet;
 
-            World.Dimension = Respawn.Dimension;
-            World.Difficulty = Respawn.Difficulty;
-            World.GameMode = Respawn.GameMode;
-            World.LevelType = Respawn.LevelType;
+            World.Dimension = respawn.Dimension;
+            World.Difficulty = respawn.Difficulty;
+            World.GameMode = respawn.GameMode;
+            World.LevelType = respawn.LevelType;
 
-            World.Chunks.Clear();
-            // And unload all chunks.
+            World.Chunks.Clear(); // And unload all chunks.
         }
 
-        private void OnPlayerPositionAndLook(IPacket packet)
+        private void OnPlayerPositionAndLook(IPacket packet) // -- Works
         {
-            var PlayerPositionAndLook = (PlayerPositionAndLookPacket) packet;
+            var playerPositionAndLook = (PlayerPositionAndLookPacket) packet;
 
             // Force to new position.
-            Player.Position.Vector3 = PlayerPositionAndLook.Vector3;
-            Player.Look.Yaw = PlayerPositionAndLook.Yaw;
-            Player.Look.Pitch = PlayerPositionAndLook.Pitch;
-            Player.Position.OnGround = PlayerPositionAndLook.OnGround;
+            Player.Position.Vector3 = playerPositionAndLook.Vector3;
+            Player.Look.Yaw = playerPositionAndLook.Yaw;
+            Player.Look.Pitch = playerPositionAndLook.Pitch;
+            Player.Position.OnGround = true;
 
-            SendPacket(new Network.Packets.Client.PlayerPositionPacket
+            SendPacket(new Network.Packets.Client.PlayerPositionAndLookPacket
             {
-                X = PlayerPositionAndLook.Vector3.X,
-                HeadY = PlayerPositionAndLook.Vector3.Y,
-                FeetY = PlayerPositionAndLook.Vector3.Y - 1.62,
-                Z = PlayerPositionAndLook.Vector3.Z,
-                OnGround = PlayerPositionAndLook.OnGround
+                X = Player.Position.Vector3.X,
+                FeetY = Player.Position.Vector3.Y,
+                Z = Player.Position.Vector3.Z,
+                Yaw = Player.Look.Yaw,
+                Pitch = Player.Look.Pitch,
+                OnGround = Player.Position.OnGround
             });
 
-            SendPacket(new Network.Packets.Client.PlayerLookPacket
+            if (!playerstarted)
             {
-                Yaw = PlayerPositionAndLook.Yaw,
-                Pitch = PlayerPositionAndLook.Pitch,
-                OnGround = PlayerPositionAndLook.OnGround
-            });
+                StartPlayerTickHandler();
+                playerstarted = true;
+            }
         }
 
-        private void OnHeldItemChange(IPacket packet)
+        private void OnHeldItemChange(IPacket packet) // -- Works
         {
-            var HeldItemChange = (HeldItemChangePacket) packet;
+            var heldItemChange = (HeldItemChangePacket) packet;
 
-            Player.HeldItem = HeldItemChange.Slot;
+            Player.HeldItem = heldItemChange.Slot;
         }
 
-        private void OnUseBed(IPacket packet)
+        private void OnUseBed(IPacket packet) // -- Works
         {
-            var UseBed = (UseBedPacket) packet;
+            var useBed = (UseBedPacket) packet;
 
-            if (!Entities.ContainsKey(UseBed.EntityID))
-                Entities.Add(UseBed.EntityID, new Entity {EntityID = UseBed.EntityID});
+            if (!Entities.ContainsKey(useBed.EntityID))
+                Entities.Add(useBed.EntityID, new Entity {EntityID = useBed.EntityID});
 
-            Entities[UseBed.EntityID].Bed = UseBed.Coordinates;
+            Entities[useBed.EntityID].Bed = useBed.Location;
         }
 
-        private void OnAnimation(IPacket packet)
+        private void OnAnimation(IPacket packet) // -- Works
         {
-            var Animation = (AnimationPacket) packet;
+            var animation = (AnimationPacket) packet;
 
-            if (!Entities.ContainsKey(Animation.EntityID))
-                Entities.Add(Animation.EntityID, new Entity {EntityID = Animation.EntityID});
+            if (!Entities.ContainsKey(animation.EntityID))
+                Entities.Add(animation.EntityID, new Entity {EntityID = animation.EntityID});
 
-            Entities[Animation.EntityID].Animation = Animation.Animation;
+            Entities[animation.EntityID].Animation = animation.Animation;
         }
 
         private void OnSpawnPlayer(IPacket packet)
         {
-            var SpawnPlayer = (SpawnPlayerPacket) packet;
+            var spawnPlayer = (SpawnPlayerPacket) packet;
 
-            if (!Entities.ContainsKey(SpawnPlayer.EntityID))
-                Entities.Add(SpawnPlayer.EntityID, new Entity {EntityID = SpawnPlayer.EntityID});
+            if (!Entities.ContainsKey(spawnPlayer.EntityID))
+                Entities.Add(spawnPlayer.EntityID, new Entity {EntityID = spawnPlayer.EntityID});
 
-            Entities[SpawnPlayer.EntityID].Player.UUID = SpawnPlayer.PlayerUUID;
-            Entities[SpawnPlayer.EntityID].Player.Name = SpawnPlayer.PlayerName;
-            Entities[SpawnPlayer.EntityID].Position = SpawnPlayer.Vector3;
+            Entities[spawnPlayer.EntityID].Player.UUID = spawnPlayer.PlayerUUID;
+            Entities[spawnPlayer.EntityID].Position = spawnPlayer.Vector3;
 
-            Entities[SpawnPlayer.EntityID].Look.Yaw = SpawnPlayer.Yaw;
-            Entities[SpawnPlayer.EntityID].Look.Pitch = SpawnPlayer.Pitch;
+            Entities[spawnPlayer.EntityID].Look.Yaw = spawnPlayer.Yaw;
+            Entities[spawnPlayer.EntityID].Look.Pitch = spawnPlayer.Pitch;
 
-            Entities[SpawnPlayer.EntityID].Metadata = SpawnPlayer.Metadata;
+            Entities[spawnPlayer.EntityID].Equipment.CurrentItem = spawnPlayer.CurrentItem;
+
+            Entities[spawnPlayer.EntityID].Metadata = spawnPlayer.EntityMetadata;
         }
 
         private void OnCollectItem(IPacket packet)
         {
-            var CollectItem = (CollectItemPacket) packet;
+            var collectItem = (CollectItemPacket) packet;
+
+            if (!Entities.ContainsKey(collectItem.CollectorEntityID))
+                Entities.Add(collectItem.CollectorEntityID, new Entity {EntityID = collectItem.CollectorEntityID});
+
+            //Entities[collectItem.CollectorEntityID] = collectItem.CollectedEntityID; TODO: CollectedID
         }
 
         private void OnSpawnObject(IPacket packet)
         {
-            var SpawnObject = (SpawnObjectPacket) packet;
+            var spawnObject = (SpawnObjectPacket) packet;
         }
 
         private void OnSpawnMob(IPacket packet)
         {
-            var SpawnMob = (SpawnMobPacket) packet;
+            var spawnMob = (SpawnMobPacket) packet;
 
-            if (!Entities.ContainsKey(SpawnMob.EntityID))
-                Entities.Add(SpawnMob.EntityID, new Entity {EntityID = SpawnMob.EntityID});
+            if (!Entities.ContainsKey(spawnMob.EntityID))
+                Entities.Add(spawnMob.EntityID, new Entity {EntityID = spawnMob.EntityID});
 
-            Entities[SpawnMob.EntityID].Position = SpawnMob.Vector3;
+            Entities[spawnMob.EntityID].Type = spawnMob.Type;
 
-            Entities[SpawnMob.EntityID].Look.Yaw = SpawnMob.Yaw;
-            Entities[SpawnMob.EntityID].Look.Pitch = SpawnMob.Pitch;
+            Entities[spawnMob.EntityID].Position = spawnMob.Vector3;
 
-            Entities[SpawnMob.EntityID].Velocity.VelocityX = SpawnMob.VelocityX;
-            Entities[SpawnMob.EntityID].Velocity.VelocityY = SpawnMob.VelocityY;
-            Entities[SpawnMob.EntityID].Velocity.VelocityZ = SpawnMob.VelocityZ;
-            Entities[SpawnMob.EntityID].Metadata = SpawnMob.Metadata;
+            Entities[spawnMob.EntityID].Look.Yaw = spawnMob.Yaw;
+            Entities[spawnMob.EntityID].Look.Pitch = spawnMob.Pitch;
+            Entities[spawnMob.EntityID].Look.HeadPitch = spawnMob.HeadPitch;
+
+            Entities[spawnMob.EntityID].Velocity.VelocityX = spawnMob.VelocityX;
+            Entities[spawnMob.EntityID].Velocity.VelocityY = spawnMob.VelocityY;
+            Entities[spawnMob.EntityID].Velocity.VelocityZ = spawnMob.VelocityZ;
+
+            Entities[spawnMob.EntityID].Metadata = spawnMob.EntityMetadata;
         }
 
         private void OnSpawnPainting(IPacket packet)
         {
-            var SpawnPainting = (SpawnPaintingPacket) packet;
+            var spawnPainting = (SpawnPaintingPacket) packet;
         }
 
         private void OnSpawnExperienceOrb(IPacket packet)
         {
-            var SpawnExperienceOrb = (SpawnExperienceOrbPacket) packet;
+            var spawnExperienceOrb = (SpawnExperienceOrbPacket) packet;
         }
 
         private void OnEntityVelocity(IPacket packet)
         {
-            var EntityVelocity = (EntityVelocityPacket) packet;
+            var entityVelocity = (EntityVelocityPacket) packet;
 
-            if (!Entities.ContainsKey(EntityVelocity.EntityID))
-                Entities.Add(EntityVelocity.EntityID, new Entity {EntityID = EntityVelocity.EntityID});
+            if (!Entities.ContainsKey(entityVelocity.EntityID))
+                Entities.Add(entityVelocity.EntityID, new Entity {EntityID = entityVelocity.EntityID});
 
-            Entities[EntityVelocity.EntityID].Velocity.VelocityX = EntityVelocity.VelocityX;
-            Entities[EntityVelocity.EntityID].Velocity.VelocityY = EntityVelocity.VelocityY;
-            Entities[EntityVelocity.EntityID].Velocity.VelocityZ = EntityVelocity.VelocityZ;
+            Entities[entityVelocity.EntityID].Velocity.VelocityX = entityVelocity.VelocityX;
+            Entities[entityVelocity.EntityID].Velocity.VelocityY = entityVelocity.VelocityY;
+            Entities[entityVelocity.EntityID].Velocity.VelocityZ = entityVelocity.VelocityZ;
         }
 
-        private void OnDestroyEntities(IPacket packet)
+        private void OnDestroyEntities(IPacket packet) // -- Works
         {
-            var DestroyEntities = (DestroyEntitiesPacket) packet;
-            foreach (int t in DestroyEntities.EntityIDs)
+            var destroyEntities = (DestroyEntitiesPacket) packet;
+
+            foreach (int t in destroyEntities.EntityIDs)
             {
                 Entities.Remove(t);
             }
@@ -231,436 +243,420 @@ namespace MineLib.ClientWrapper
 
         private void OnEntity(IPacket packet)
         {
-            var Entity = (EntityPacket) packet;
-            if (!Entities.ContainsKey(Entity.EntityID))
-                Entities.Add(Entity.EntityID, new Entity {EntityID = Entity.EntityID});
+            var entity = (EntityPacket) packet;
+
+            if (!Entities.ContainsKey(entity.EntityID))
+                Entities.Add(entity.EntityID, new Entity {EntityID = entity.EntityID});
         }
 
         private void OnEntityRelativeMove(IPacket packet)
         {
-            var EntityRelativeMove = (EntityRelativeMovePacket) packet;
+            var entityRelativeMove = (EntityRelativeMovePacket) packet;
 
-            if (!Entities.ContainsKey(EntityRelativeMove.EntityID))
-                Entities.Add(EntityRelativeMove.EntityID, new Entity {EntityID = EntityRelativeMove.EntityID});
+            if (!Entities.ContainsKey(entityRelativeMove.EntityID))
+                Entities.Add(entityRelativeMove.EntityID, new Entity {EntityID = entityRelativeMove.EntityID});
 
-            Entities[EntityRelativeMove.EntityID].Position = EntityRelativeMove.DeltaVector3; //Nope
+            Entities[entityRelativeMove.EntityID].Position = entityRelativeMove.DeltaVector3; //Nope
+
+            Entities[entityRelativeMove.EntityID].OnGround = entityRelativeMove.OnGround;
         }
 
         private void OnEntityLook(IPacket packet)
         {
-            var EntityLook = (EntityLookPacket) packet;
+            var entityLook = (EntityLookPacket) packet;
 
-            if (!Entities.ContainsKey(EntityLook.EntityID))
-                Entities.Add(EntityLook.EntityID, new Entity {EntityID = EntityLook.EntityID});
+            if (!Entities.ContainsKey(entityLook.EntityID))
+                Entities.Add(entityLook.EntityID, new Entity {EntityID = entityLook.EntityID});
 
-            Entities[EntityLook.EntityID].Look.Yaw = EntityLook.Yaw;
-            Entities[EntityLook.EntityID].Look.Pitch = EntityLook.Pitch;
+            Entities[entityLook.EntityID].Look.Yaw = entityLook.Yaw;
+            Entities[entityLook.EntityID].Look.Pitch = entityLook.Pitch;
+
+            Entities[entityLook.EntityID].OnGround = entityLook.OnGround;
         }
 
         private void OnEntityLookAndRelativeMove(IPacket packet)
         {
-            var EntityLookAndRelativeMove = (EntityLookAndRelativeMovePacket) packet;
+            var entityLookAndRelativeMove = (EntityLookAndRelativeMovePacket) packet;
 
-            if (!Entities.ContainsKey(EntityLookAndRelativeMove.EntityID))
-                Entities.Add(EntityLookAndRelativeMove.EntityID,
-                    new Entity {EntityID = EntityLookAndRelativeMove.EntityID});
+            if (!Entities.ContainsKey(entityLookAndRelativeMove.EntityID))
+                Entities.Add(entityLookAndRelativeMove.EntityID,
+                    new Entity {EntityID = entityLookAndRelativeMove.EntityID});
 
-            Entities[EntityLookAndRelativeMove.EntityID].Position = EntityLookAndRelativeMove.DeltaVector3; //Nope
-            Entities[EntityLookAndRelativeMove.EntityID].Look.Yaw = EntityLookAndRelativeMove.Yaw;
-            Entities[EntityLookAndRelativeMove.EntityID].Look.Pitch = EntityLookAndRelativeMove.Pitch;
+            Entities[entityLookAndRelativeMove.EntityID].Position = entityLookAndRelativeMove.DeltaVector3; //Nope
+
+            Entities[entityLookAndRelativeMove.EntityID].Look.Yaw = entityLookAndRelativeMove.Yaw;
+            Entities[entityLookAndRelativeMove.EntityID].Look.Pitch = entityLookAndRelativeMove.Pitch;
+
+            Entities[entityLookAndRelativeMove.EntityID].OnGround = entityLookAndRelativeMove.OnGround;
         }
 
         private void OnEntityTeleport(IPacket packet)
         {
-            var EntityTeleport = (EntityTeleportPacket) packet;
+            var entityTeleport = (EntityTeleportPacket) packet;
 
-            if (!Entities.ContainsKey(EntityTeleport.EntityID))
-                Entities.Add(EntityTeleport.EntityID, new Entity {EntityID = EntityTeleport.EntityID});
+            if (!Entities.ContainsKey(entityTeleport.EntityID))
+                Entities.Add(entityTeleport.EntityID, new Entity {EntityID = entityTeleport.EntityID});
 
-            Entities[EntityTeleport.EntityID].Position = EntityTeleport.Vector3;
-            Entities[EntityTeleport.EntityID].Look.Yaw = EntityTeleport.Yaw;
-            Entities[EntityTeleport.EntityID].Look.Pitch = EntityTeleport.Pitch;
+            Entities[entityTeleport.EntityID].Position = entityTeleport.Vector3;
+
+            Entities[entityTeleport.EntityID].Look.Yaw = entityTeleport.Yaw;
+            Entities[entityTeleport.EntityID].Look.Pitch = entityTeleport.Pitch;
+
+            Entities[entityTeleport.EntityID].OnGround = entityTeleport.OnGround;
         }
 
         private void OnEntityHeadLook(IPacket packet)
         {
-            var EntityHeadLook = (EntityHeadLookPacket) packet;
+            var entityHeadLook = (EntityHeadLookPacket) packet;
 
-            if (!Entities.ContainsKey(EntityHeadLook.EntityID))
-                Entities.Add(EntityHeadLook.EntityID, new Entity {EntityID = EntityHeadLook.EntityID});
+            if (!Entities.ContainsKey(entityHeadLook.EntityID))
+                Entities.Add(entityHeadLook.EntityID, new Entity {EntityID = entityHeadLook.EntityID});
 
-            Entities[EntityHeadLook.EntityID].Look.Yaw = EntityHeadLook.HeadYaw;
+            Entities[entityHeadLook.EntityID].Look.HeadYaw = entityHeadLook.HeadYaw;
         }
 
         private void OnEntityStatus(IPacket packet)
         {
-            var EntityStatus = (EntityStatusPacket) packet;
+            var entityStatus = (EntityStatusPacket) packet;
 
-            if (!Entities.ContainsKey(EntityStatus.EntityID))
-                Entities.Add(EntityStatus.EntityID, new Entity {EntityID = EntityStatus.EntityID});
+            if (!Entities.ContainsKey(entityStatus.EntityID))
+                Entities.Add(entityStatus.EntityID, new Entity {EntityID = entityStatus.EntityID});
 
-            Entities[EntityStatus.EntityID].Status = EntityStatus.Status;
+            Entities[entityStatus.EntityID].Status = entityStatus.Status;
         }
 
         private void OnAttachEntity(IPacket packet)
         {
-            var AttachEntity = (AttachEntityPacket) packet;
+            var attachEntity = (AttachEntityPacket) packet;
 
-            if (!Entities.ContainsKey(AttachEntity.EntityID))
-                Entities.Add(AttachEntity.EntityID, new Entity {EntityID = AttachEntity.EntityID});
+            if (!Entities.ContainsKey(attachEntity.EntityID))
+                Entities.Add(attachEntity.EntityID, new Entity {EntityID = attachEntity.EntityID});
 
-            Entities[AttachEntity.EntityID].Vehicle.VehicleID = AttachEntity.VehicleID;
-            Entities[AttachEntity.EntityID].Leash = AttachEntity.Leash;
+            Entities[attachEntity.EntityID].Vehicle.VehicleID = attachEntity.VehicleID;
+
+            Entities[attachEntity.EntityID].Leash = attachEntity.Leash;
         }
 
         private void OnEntityMetadata(IPacket packet)
         {
-            var EntityMetadata = (EntityMetadataPacket) packet;
+            var entityMetadata = (EntityMetadataPacket) packet;
 
-            if (!Entities.ContainsKey(EntityMetadata.EntityID))
-                Entities.Add(EntityMetadata.EntityID, new Entity {EntityID = EntityMetadata.EntityID});
+            if (!Entities.ContainsKey(entityMetadata.EntityID))
+                Entities.Add(entityMetadata.EntityID, new Entity {EntityID = entityMetadata.EntityID});
 
-            Entities[EntityMetadata.EntityID].Metadata = EntityMetadata.Metadata;
+            Entities[entityMetadata.EntityID].Metadata = entityMetadata.Metadata;
         }
 
         private void OnEntityEffect(IPacket packet)
         {
-            var EntityEffect = (EntityEffectPacket) packet;
+            var entityEffect = (EntityEffectPacket) packet;
 
-            if (Player.EntityID == EntityEffect.EntityID)
+            if (Player.EntityID == entityEffect.EntityID)
             {
                 Player.Effects.Add(new PlayerEffect
                 {
-                    EffectID = EntityEffect.EffectID,
-                    Amplifier = EntityEffect.Amplifier,
-                    Duration = EntityEffect.Duration
+                    EffectID = entityEffect.EffectID,
+                    Amplifier = entityEffect.Amplifier,
+                    Duration = entityEffect.Duration,
+                    HideParticle = entityEffect.HideParticles
                 });
             }
             else
             {
-                if (Entities.ContainsKey(EntityEffect.EntityID))
+                if (Entities.ContainsKey(entityEffect.EntityID))
                     return;
 
-                Entities.Add(EntityEffect.EntityID, new Entity {EntityID = EntityEffect.EntityID});
-                Entities[EntityEffect.EntityID].Effects.Add(new EntityEffect
+                Entities.Add(entityEffect.EntityID, new Entity {EntityID = entityEffect.EntityID});
+                Entities[entityEffect.EntityID].Effects.Add(new EntityEffect
                 {
-                    EffectID = EntityEffect.EffectID,
-                    Amplifier = EntityEffect.Amplifier,
-                    Duration = EntityEffect.Duration
+                    EffectID = entityEffect.EffectID,
+                    Amplifier = entityEffect.Amplifier,
+                    Duration = entityEffect.Duration,
+                    HideParticle = entityEffect.HideParticles
                 });
             }
         }
 
         private void OnRemoveEntityEffect(IPacket packet)
         {
-            var RemoveEntityEffect = (RemoveEntityEffectPacket) packet;
+            var removeEntityEffect = (RemoveEntityEffectPacket) packet;
 
-            if (Player.EntityID == RemoveEntityEffect.EntityID)
+            if (Player.EntityID == removeEntityEffect.EntityID)
             {
                 foreach (var effect in Player.Effects.ToArray())
                 {
-                    if (effect.EffectID == RemoveEntityEffect.EffectID)
+                    if (effect.EffectID == removeEntityEffect.EffectID)
                         Player.Effects.Remove(effect);
                 }
             }
             else
             {
-                if (!Entities.ContainsKey(RemoveEntityEffect.EntityID))
-                    Entities.Add(RemoveEntityEffect.EntityID, new Entity {EntityID = RemoveEntityEffect.EntityID});
+                if (!Entities.ContainsKey(removeEntityEffect.EntityID))
+                    Entities.Add(removeEntityEffect.EntityID, new Entity {EntityID = removeEntityEffect.EntityID});
 
-                foreach (var effect in Entities[RemoveEntityEffect.EntityID].Effects.ToArray())
+                foreach (var effect in Entities[removeEntityEffect.EntityID].Effects.ToArray())
                 {
-                    if (effect.EffectID == RemoveEntityEffect.EffectID)
-                        Entities[RemoveEntityEffect.EntityID].Effects.Remove(effect);
+                    if (effect.EffectID == removeEntityEffect.EffectID)
+                        Entities[removeEntityEffect.EntityID].Effects.Remove(effect);
                 }
             }
         }
 
         private void OnSetExperience(IPacket packet)
         {
-            var SetExperience = (SetExperiencePacket) packet;
+            var setExperience = (SetExperiencePacket) packet;
 
-            Player.Experience.ExperienceBar = SetExperience.ExperienceBar;
-            Player.Experience.Level = SetExperience.Level;
-            Player.Experience.TotalExperience = SetExperience.TotalExperience;
+            Player.Experience.ExperienceBar = setExperience.ExperienceBar;
+            Player.Experience.Level = setExperience.Level;
+            Player.Experience.TotalExperience = setExperience.TotalExperience;
         }
 
         private void OnEntityProperties(IPacket packet)
         {
-            var EntityProperties = (EntityPropertiesPacket) packet;
+            var entityProperties = (EntityPropertiesPacket) packet;
 
-            if (!Entities.ContainsKey(EntityProperties.EntityID))
-                Entities.Add(EntityProperties.EntityID, new Entity {EntityID = EntityProperties.EntityID});
+            if (!Entities.ContainsKey(entityProperties.EntityID))
+                Entities.Add(entityProperties.EntityID, new Entity {EntityID = entityProperties.EntityID});
 
-            Entities[EntityProperties.EntityID].Properties = EntityProperties.Properties;
+            Entities[entityProperties.EntityID].Properties = entityProperties.EntityProperties;
         }
 
         private void OnChunkData(IPacket packet) // -- Works
         {
-            var ChunkData = (ChunkDataPacket) packet;
+            var chunkData = (ChunkDataPacket) packet;
 
             if (World == null)
                 World = new World();
 
-            if (ChunkData.PrimaryBitMap == 0)
+            if (chunkData.Chunk.PrimaryBitMap == 0)
             {
-                var cIndex = World.GetChunkIndex(ChunkData.Coordinates);
-
-                if (cIndex != -1)
-                    World.Chunks.RemoveAt(cIndex);
-
+                World.RemoveChunk(chunkData.Chunk.Coordinates);
                 return;
             }
 
-            // -- Create new chunk
-            var chunk = new Chunk
-            {
-                Coordinates = ChunkData.Coordinates,
-                PrimaryBitMap = ChunkData.PrimaryBitMap,
-                AddBitMap = ChunkData.AddBitMap,
-                SkyLightSent = ChunkData.SkyLightSend,
-                GroundUp = ChunkData.GroundUp
-            };
-
-            // -- Decompress the data
-            byte[] decompressedData = ZlibStream.UncompressBuffer(ChunkData.Data);
-
-            chunk.ReadChunkData(decompressedData);
-
             // -- Add the chunk to the world
-            World.SetChunk(chunk);     
+            World.SetChunk(chunkData.Chunk);     
         }
 
-        private void OnMultiBlockChange(IPacket packet) // Bug: Nope
+        private void OnMultiBlockChange(IPacket packet) // -- Works
         {
-            var MultiBlockChange = (MultiBlockChangePacket)packet;
-            for (var i = 0; i < MultiBlockChange.RecordCount; i++)
-            {
-                var block = new Block
-                {
-                    Id = MultiBlockChange.RecordsArray[i].BlockID,
-                    Meta = MultiBlockChange.RecordsArray[i].Metadata,
-                };
+            var multiBlockChange = (MultiBlockChangePacket) packet;
 
-                //World.SetBlock(MultiBlockChange.RecordsArray[i].Coordinates, block);
-            }
-           
+            foreach (var record in multiBlockChange.RecordList.GetRecords())
+            {
+                var id = (short) (record.BlockIDMeta >> 4);
+                var meta = (byte)(record.BlockIDMeta & 15);
+                var block = new Block(id, meta);
+                //var block = new Block(id, meta, record.Coordinates);
+
+                World.SetBlock(record.Coordinates, multiBlockChange.Coordinates, block);
+            }      
         }
 
-        private void OnBlockChange(IPacket packet) // Bug: Nope
+        private void OnBlockChange(IPacket packet) // -- Works
         {
-            var BlockChange = (BlockChangePacket) packet;
+            var blockChange = (BlockChangePacket) packet;
 
-            var data = new Block
-            {
-                Id = BlockChange.BlockID,
-                Meta = BlockChange.BlockMetadata,
-                Name = Block.GetName(BlockChange.BlockID, BlockChange.BlockMetadata)
-            };
+            var id = (short) (blockChange.BlockIDMeta >> 4);
+            var meta = (byte)(blockChange.BlockIDMeta & 15);
 
-            //World.SetBlock(BlockChange.Coordinates, data);
+            var block = new Block(id, meta);
+            //var block = new Block(id, meta, blockChange.Location);
+
+            World.SetBlock(blockChange.Location, block);
         }
 
         private void OnBlockAction(IPacket packet)
         {
+            var blockAction = (BlockActionPacket) packet;
         }
 
         private void OnBlockBreakAnimation(IPacket packet)
         {
+            var blockBreakAnimation = (BlockBreakAnimationPacket)packet;
         }
 
         private void OnMapChunkBulk(IPacket packet) //Bug: Nope
         {
-            /*
-            var MapChunkBulk = (MapChunkBulkPacket) packet;
+            var mapChunkBulk = (MapChunkBulkPacket) packet;
 
-            var chunks = new Chunk[MapChunkBulk.ChunkColumnCount];
+            if (World == null)
+                World = new World();
 
-            byte[] decompressedData = ZlibStream.UncompressBuffer(MapChunkBulk.ChunkData);
-
-            //try { DecompressedData = ZlibStream.UncompressBuffer(MapChunkBulk.ChunkData); }
-            //catch { World.DamagedChunks.Add(MapChunkBulk); return; }
-
-            var i = 0;
-            foreach (var metadata in MapChunkBulk.MetaInformation)
-            {
-                chunks[i] = new Chunk
-                {
-                    Coordinates = metadata.Coordinates,
-                    PrimaryBitMap = metadata.PrimaryBitMap,
-                    AddBitMap = metadata.AddBitMap,
-                    SkyLightSent = metadata.SkyLightSend,
-                    GroundUp = metadata.GroundUp
-                };
-
-                decompressedData = chunks[i].ReadChunkData(decompressedData);
-                // -- Calls the chunk class to take all of the bytes it needs, and return whats left.
-
-                World.SetChunk(chunks[i]);
-                i++;
-            }
-            */
+            foreach (var chunk in mapChunkBulk.ChunkList.GetChunk())
+                World.SetChunk(chunk);
         }
 
         private void OnExplosion(IPacket packet)
         {
+            var explosion = (ExplosionPacket) packet;
         }
 
         private void OnEffect(IPacket packet)
         {
-            var Effect = (EffectPacket) packet;
+            var effect = (EffectPacket) packet;
 
-            PlayEffect(Effect.EffectID, Effect.Coordinates, Effect.Data, Effect.DisableRelativeVolume);
+            PlayEffect(effect.EffectID, effect.Location, effect.Data, effect.DisableRelativeVolume);
         }
 
         private void OnSoundEffect(IPacket packet)
         {
-            var SoundEffect = (SoundEffectPacket) packet;
+            var soundEffect = (SoundEffectPacket) packet;
 
-            PlaySound(SoundEffect.SoundName, SoundEffect.Coordinates, SoundEffect.Volume, SoundEffect.Pitch);
+            PlaySound(soundEffect.SoundName, soundEffect.Coordinates, soundEffect.Volume, soundEffect.Pitch);
         }
 
         private void OnParticle(IPacket packet)
         {
+            var particle = (ParticlePacket) packet;
+
+            //CreateParticle();
         }
 
         private void OnChangeGameState(IPacket packet)
         {
-            var ChangeGameState = (ChangeGameStatePacket) packet;
+            var changeGameState = (ChangeGameStatePacket) packet;
 
-            World.StateChanged.Reason = ChangeGameState.Reason;
-            World.StateChanged.Value = ChangeGameState.Value;
+            World.StateChanged.Reason = changeGameState.Reason;
+            World.StateChanged.Value = changeGameState.Value;
         }
 
         private void OnSpawnGlobalEntity(IPacket packet)
         {
+            var spawnGlobalEntity = (SpawnGlobalEntityPacket)packet;
         }
 
         private void OnOpenWindow(IPacket packet)
         {
-            var OpenWindow = (OpenWindowPacket) packet;
+            var openWindow = (OpenWindowPacket) packet;
 
-            Player.OpenWindow(OpenWindow.WindowID, OpenWindow.InventoryType, OpenWindow.WindowTitle,
-                OpenWindow.NumberOfSlots, OpenWindow.UseProvidedTitle, OpenWindow.EntityID);
+            Player.OpenWindow(openWindow.WindowID, openWindow.InventoryType, openWindow.WindowTitle, openWindow.NumberOfSlots, openWindow.EntityID);
         }
 
         private void OnCloseWindow(IPacket packet)
         {
-            var CloseWindow = (CloseWindowPacket) packet;
+            var closeWindow = (CloseWindowPacket) packet;
 
-            Player.CloseWindow(CloseWindow.WindowID);
+            Player.CloseWindow(closeWindow.WindowID);
         }
 
         private void OnSetSlot(IPacket packet)
         {
-            var SetSlot = (SetSlotPacket) packet;
+            var setSlot = (SetSlotPacket) packet;
 
-            Player.SetSlot(SetSlot.WindowId, SetSlot.Slot, SetSlot.SlotData);
+            //Player.SetSlot(setSlot.WindowId, setSlot.Slot, setSlot.SlotData);
         }
 
         private void OnWindowItems(IPacket packet)
         {
-            var WindowItems = (WindowItemsPacket) packet;
+            var windowItems = (WindowItemsPacket) packet;
 
-            Player.SetWindowItems(WindowItems.WindowId, WindowItems.SlotData);
+            Player.SetWindowItems(windowItems.WindowID, windowItems.ItemStackList);
         }
 
         private void OnWindowProperty(IPacket packet)
         {
-            var WindowProperty = (WindowPropertyPacket) packet;
+            var windowProperty = (WindowPropertyPacket) packet;
         }
 
         private void OnConfirmTransaction(IPacket packet)
         {
-            var ConfirmTransaction = (ConfirmTransactionPacket) packet;
+            var confirmTransaction = (ConfirmTransactionPacket) packet;
 
-            Player.ConfirmTransaction(ConfirmTransaction.WindowId, ConfirmTransaction.ActionNumber,
-                ConfirmTransaction.Accepted);
+            Player.ConfirmTransaction(confirmTransaction.WindowId, confirmTransaction.ActionNumber, confirmTransaction.Accepted);
         }
 
         private void OnUpdateSign(IPacket packet)
         {
+            var updateSign = (UpdateSignPacket) packet;
         }
 
         private void OnMaps(IPacket packet)
         {
+            var maps = (MapsPacket) packet;
         }
 
         private void OnUpdateBlockEntity(IPacket packet)
         {
+            var updateBlockEntity = (UpdateBlockEntityPacket) packet;
         }
 
         private void OnSignEditorOpen(IPacket packet)
         {
-            var SignEditorOpen = (SignEditorOpenPacket) packet;
+            var signEditorOpen = (SignEditorOpenPacket) packet;
 
-            EditSign(SignEditorOpen.Coordinates);
+            EditSign(signEditorOpen.Location);
         }
 
         private void OnStatistics(IPacket packet)
         {
-            var Statistics = (StatisticsPacket) packet;
+            var statistics = (StatisticsPacket) packet;
 
-            Player.Statistics.Count = Statistics.Count;
-            Player.Statistics.StatisticsName = Statistics.StatisticsName;
-            Player.Statistics.Value = Statistics.Value;
+            Player.Statistics = statistics.StatisticsEntryList;
         }
 
         private void OnPlayerListItem(IPacket packet)
         {
-            var PlayerListItem = (PlayerListItemPacket) packet;
+            var playerListItem = (PlayerListItemPacket) packet;
 
             // Maybe Clear PlayerList?
-            if (!PlayersList.ContainsKey(PlayerListItem.PlayerName))
-                PlayersList.Add(PlayerListItem.PlayerName, PlayerListItem.Ping);
+            //if (!PlayersList.ContainsKey(playerListItem.PlayerName))
+            //    PlayersList.Add(playerListItem.PlayerName, playerListItem.Ping);
         }
 
         private void OnPlayerAbilities(IPacket packet)
         {
-            var PlayerAbilities = (PlayerAbilitiesPacket) packet;
-            Player.Abilities.Flags = PlayerAbilities.Flags;
-            Player.Abilities.FlyingSpeed = PlayerAbilities.FlyingSpeed;
-            Player.Abilities.WalkingSpeed = PlayerAbilities.WalkingSpeed;
+            var playerAbilities = (PlayerAbilitiesPacket) packet;
+
+            Player.Abilities.Flags = playerAbilities.Flags;
+            Player.Abilities.FlyingSpeed = playerAbilities.FlyingSpeed;
+            Player.Abilities.WalkingSpeed = playerAbilities.WalkingSpeed;
         }
 
         private void OnTabComplete(IPacket packet)
         {
+            var tabComplete = (TabCompletePacket) packet;
         }
 
         private void OnScoreboardObjective(IPacket packet)
         {
+            var scoreboardObjective = (ScoreboardObjectivePacket) packet;
         }
 
         private void OnUpdateScore(IPacket packet)
         {
+            var updateScore = (UpdateScorePacket) packet;
         }
 
         private void OnDisplayScoreboard(IPacket packet)
         {
+            var displayScoreboard = (DisplayScoreboardPacket) packet;
         }
 
         private void OnTeams(IPacket packet)
         {
+            var teams = (TeamsPacket) packet;
         }
 
         private void OnPluginMessage(IPacket packet)
         {
-            var PluginMessage = (PluginMessagePacket) packet;
+            var pluginMessage = (PluginMessagePacket) packet;
 
-            switch (PluginMessage.Channel)
+            switch (pluginMessage.Channel)
             {
                 case "MC|Brand":
-                    ServerBrand = Encoding.UTF8.GetString(PluginMessage.Data);
+                    ServerBrand = Encoding.UTF8.GetString(pluginMessage.Data);
                     break;
 
                 default:
-                    PluginMessageUnhandled.Add(PluginMessage.Channel + " : " + Encoding.UTF8.GetString(PluginMessage.Data));
+                    PluginMessageUnhandled.Add(pluginMessage.Channel + " : " + Encoding.UTF8.GetString(pluginMessage.Data));
                     break;
             }
         }
 
         private void OnDisconnect(IPacket packet)
         {
+            var disconnect = (DisconnectPacket)packet;
         }
 
         #endregion
