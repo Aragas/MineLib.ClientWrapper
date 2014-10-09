@@ -447,7 +447,6 @@ namespace MineLib.ClientWrapper
                 var id = (short) (record.BlockIDMeta >> 4);
                 var meta = (byte)(record.BlockIDMeta & 15);
                 var block = new Block(id, meta);
-                //var block = new Block(id, meta, record.Coordinates);
 
                 World.SetBlock(record.Coordinates, multiBlockChange.Coordinates, block);
             }      
@@ -461,8 +460,7 @@ namespace MineLib.ClientWrapper
             var meta = (byte)(blockChange.BlockIDMeta & 15);
 
             var block = new Block(id, meta);
-            //var block = new Block(id, meta, blockChange.Location);
-
+            
             World.SetBlock(blockChange.Location, block);
         }
 

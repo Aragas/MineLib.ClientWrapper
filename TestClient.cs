@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Threading;
 using MineLib.Network.BaseClients;
 using MineLib.Network.Enums;
 using MineLib.Network.Packets;
@@ -34,7 +35,7 @@ namespace MineLib.ClientWrapper
 
             Client.Connect(ServerIP, ServerPort);
 
-            while (!Client.Connected) { }
+            while (!Client.Connected) { Thread.Sleep(250); }
 
             Client.SendPacket(new HandshakePacket
             {
@@ -46,7 +47,7 @@ namespace MineLib.ClientWrapper
 
             Client.SendPacket(new LoginStartPacket { Name = "TestBot" });
 
-            while (Client.State != ServerState.Play) { }
+            while (Client.State != ServerState.Play) { Thread.Sleep(250); }
 
             Client.SendPacket(new PluginMessagePacket
             {
@@ -56,7 +57,7 @@ namespace MineLib.ClientWrapper
 
             Client.SendPacket(new ClientStatusPacket { Status = ClientStatus.Respawn });
 
-            while (true) { }
+            while (true) { Thread.Sleep(1000); }
         }
     }
 }
