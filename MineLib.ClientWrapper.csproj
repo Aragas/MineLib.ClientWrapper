@@ -86,11 +86,11 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BigData\Entity.cs" />
-    <Compile Include="BigData\Object.cs" />
-    <Compile Include="BigData\Player.cs" />
-    <Compile Include="BigData\Vehicle.cs" />
-    <Compile Include="BigData\World.cs" />
+    <Compile Include="Main\BigData\Entity.cs" />
+    <Compile Include="Main\BigData\Object.cs" />
+    <Compile Include="Main\BigData\Player.cs" />
+    <Compile Include="Main\BigData\Vehicle.cs" />
+    <Compile Include="Main\BigData\World.cs" />
     <Compile Include="Minecraft.Classic.Events.cs" />
     <Compile Include="Minecraft.Classic.Packets.cs" />
     <Compile Include="Minecraft.Classic.Login.cs" />
@@ -99,7 +99,7 @@
     <Compile Include="Minecraft.Main.Events.cs" />
     <Compile Include="Minecraft.Main.Packets.cs" />
     <Compile Include="Minecraft.Main.Login.cs" />
-    <Compile Include="PlayerHandler.cs" />
+    <Compile Include="Main\PlayerHandler.cs" />
     <Compile Include="TestClient.Main.cs" />
     <Compile Include="TestClient.Classic.cs" />
   </ItemGroup>

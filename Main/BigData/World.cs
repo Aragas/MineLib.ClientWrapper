@@ -5,7 +5,7 @@ using MineLib.Network.Main.Data;
 using MineLib.Network.Main.Data.Anvil;
 using MineLib.Network.Main.Enums;
 
-namespace MineLib.ClientWrapper.BigData
+namespace MineLib.ClientWrapper.Main.BigData
 {
     // Just ignore it. I think something is wrong here :DD
     internal static class TimeSpanUtil

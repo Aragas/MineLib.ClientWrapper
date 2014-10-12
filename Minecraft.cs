@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using MineLib.ClientWrapper.BigData;
+using MineLib.ClientWrapper.Main;
+using MineLib.ClientWrapper.Main.BigData;
 using MineLib.Network;
 using MineLib.Network.Main.Packets.Client;
 
@@ -67,12 +68,12 @@ namespace MineLib.ClientWrapper
         public bool ReducedDebugInfo;
 
         public NetworkHandler Handler;
-        public PlayerTickHandler PlayerHandler;
 
-        public World World;
-        public Player Player;
-        public Dictionary<int, Entity> Entities;
-        public Dictionary<string, short> PlayersList;
+        public World MainWorld;
+        public Player MainPlayer;
+        public Dictionary<int, Entity> MainEntities;
+        public Dictionary<string, short> MainPlayersList;
+        public PlayerTickHandler MainPlayerHandler;
 
         /// <summary>
         /// Create a new Minecraft Instance
@@ -123,8 +124,8 @@ namespace MineLib.ClientWrapper
 
         private void StartPlayerTickHandler()
         {
-            PlayerHandler = new PlayerTickHandler(this);
-            PlayerHandler.Start();
+            MainPlayerHandler = new PlayerTickHandler(this);
+            MainPlayerHandler.Start();
         }
 
         /// <summary>
@@ -141,21 +142,22 @@ namespace MineLib.ClientWrapper
             if (Handler != null)
                 Disconnect();
 
-            World = new World();
-            Player = new Player();
-            Entities = new Dictionary<int, Entity>();
-            PlayersList = new Dictionary<string, short>();
-
             Handler = new NetworkHandler(this, Mode);
 
-            // -- Register our event handlers.
             switch (Mode)
             {
                 case NetworkMode.Main:
+                    MainWorld = new World();
+                    MainPlayer = new Player();
+                    MainEntities = new Dictionary<int, Entity>();
+                    MainPlayersList = new Dictionary<string, short>();
+
+                    // -- Register our event handlers.
                     Handler.OnPacketHandled += RaisePacketHandled;
                     break;
 
                 case NetworkMode.Classic:
+                    // -- Register our event handlers.
                     Handler.OnPacketHandled += RaisePacketHandledClassic;
                     break;
             }
@@ -191,10 +193,10 @@ namespace MineLib.ClientWrapper
             // -- Reset all variables to default so we can make a new connection.
             State = ServerState.MainLogin;
 
-            World = null;
-            Player = null;
-            PlayersList = null;
-            Entities = null;
+            MainWorld = null;
+            MainPlayer = null;
+            MainPlayersList = null;
+            MainEntities = null;
         }
 
         public void Dispose()

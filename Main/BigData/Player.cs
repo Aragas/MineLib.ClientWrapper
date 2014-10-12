@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using MineLib.Network.Main.Data;
 using MineLib.Network.Main.Enums;
 
-namespace MineLib.ClientWrapper.BigData
+namespace MineLib.ClientWrapper.Main.BigData
 {
     public class Player
     {

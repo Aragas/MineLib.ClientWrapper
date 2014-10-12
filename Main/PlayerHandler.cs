@@ -2,7 +2,7 @@
 using MineLib.Network;
 using MineLib.Network.Main.Packets.Client;
 
-namespace MineLib.ClientWrapper
+namespace MineLib.ClientWrapper.Main
 {
     // Not used
     public class PlayerTickHandler

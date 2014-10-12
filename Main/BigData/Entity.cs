@@ -4,7 +4,7 @@ using MineLib.Network.Main.Data;
 using MineLib.Network.Main.Enums;
 using Org.BouncyCastle.Math;
 
-namespace MineLib.ClientWrapper.BigData
+namespace MineLib.ClientWrapper.Main.BigData
 {
     public class Entity
     {
