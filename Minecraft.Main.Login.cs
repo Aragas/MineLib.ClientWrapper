@@ -7,37 +7,29 @@ namespace MineLib.ClientWrapper
         /// <summary>
         ///     Login to Minecraft.net and store credentials
         /// </summary>
-        private void Login()
+        private void MainLogin()
         {
-            if (VerifyNames)
-            {
-                var result = Yggdrasil.Login(ClientLogin, ClientPassword);
+            var result = Yggdrasil.Login(ClientLogin, ClientPassword);
 
-                switch (result.Status)
-                {
-                    case YggdrasilStatus.Success:
-                        AccessToken = result.Response.AccessToken;
-                        ClientToken = result.Response.ClientToken;
-                        _clientUsername = result.Response.Profile.Name;
-                        SelectedProfile = result.Response.Profile.ID;
-                        break;
-
-                    default:
-                        VerifyNames = false; // -- Fall back to no auth.
-                        break;
-                }
-            }
-            else
+            switch (result.Status)
             {
-                AccessToken = "None";
-                SelectedProfile = "None";
+                case YggdrasilStatus.Success:
+                    AccessToken = result.Response.AccessToken;
+                    ClientToken = result.Response.ClientToken;
+                    _clientUsername = result.Response.Profile.Name;
+                    SelectedProfile = result.Response.Profile.ID;
+                    break;
+
+                default:
+                    VerifyNames = false; // -- Fall back to no auth.
+                    break;
             }
         }
 
         /// <summary>
         ///     Uses a client's stored credentials to verify with Minecraft.net
         /// </summary>
-        public bool RefreshSession()
+        public bool MainRefreshSession()
         {
             if (!VerifyNames)
                 return false;
@@ -56,7 +48,7 @@ namespace MineLib.ClientWrapper
             }
         }
 
-        public bool VerifySession()
+        public bool MainVerifySession()
         {
             if (!VerifyNames)
                 return false;
@@ -64,7 +56,7 @@ namespace MineLib.ClientWrapper
             return Yggdrasil.VerifySession(AccessToken);
         }
 
-        public bool Invalidate()
+        public bool MainInvalidate()
         {
             if (!VerifyNames)
                 return false;
@@ -72,13 +64,12 @@ namespace MineLib.ClientWrapper
             return Yggdrasil.Invalidate(AccessToken, ClientToken);
         }
 
-        public bool Logout()
+        public bool MainLogout()
         {
             if (!VerifyNames)
                 return false;
 
             return Yggdrasil.Logout(ClientLogin, ClientPassword);
         }
-
     }
 }

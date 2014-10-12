@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using MineLib.ClientWrapper.BigData;
 using MineLib.Network;
-using MineLib.Network.Enums;
-using MineLib.Network.Packets;
-using MineLib.Network.Packets.Client;
+using MineLib.Network.Main.Packets.Client;
 
 namespace MineLib.ClientWrapper
 {
@@ -41,7 +38,7 @@ namespace MineLib.ClientWrapper
 
         public string ClientPassword { get; set; }
 
-        public string ClientBrand { get { return "MineLib.Net";} }
+        public string ClientBrand { get { return "MineLib.Network";} }
 
         public string ServerBrand { get; set; }
 
@@ -51,7 +48,15 @@ namespace MineLib.ClientWrapper
 
         public short ServerPort { get; set; }
 
+        public string ServerSalt { get; set; }
+
+        public string ServerName { get; set; }
+
+        public string ServerMOTD { get; set; }
+
         public ServerState State { get; set; }
+
+        public NetworkMode Mode { get; set; }
 
         #endregion Variables
 
@@ -69,22 +74,51 @@ namespace MineLib.ClientWrapper
         public Dictionary<int, Entity> Entities;
         public Dictionary<string, short> PlayersList;
 
-        public Thread PlayerHandlerThread;
-
         /// <summary>
         /// Create a new Minecraft Instance
         /// </summary>
         /// <param name="login">The username to use when connecting to Minecraft</param>
         /// <param name="password">The password to use when connecting to Minecraft (Ignore if you are providing credentials)</param>
         /// <param name="nameVerification">To connect using Name Verification or not</param>
-        public Minecraft(string login, string password, bool nameVerification = false)
+        /// <param name="classic">Classic mode</param>
+        /// <param name="serverSalt"></param>
+        public Minecraft(string login, string password, bool nameVerification = false, NetworkMode mode = NetworkMode.Main, string serverSalt = null)
         {
             ClientLogin = login;
             ClientPassword = password;
             VerifyNames = nameVerification;
+            Mode = mode;
+            ServerSalt = serverSalt;
 
-            if(VerifyNames)
-                Login();
+            switch (Mode)
+            {
+                case NetworkMode.Main:
+                    State = ServerState.MainLogin;
+                    break;
+
+                case NetworkMode.Classic:
+                    State = ServerState.ClassicLogin;
+                    break;
+            }
+
+            if (VerifyNames)
+            {
+                switch (Mode)
+                {
+                    case NetworkMode.Main:
+                        MainLogin();
+                        break;
+
+                    case NetworkMode.Classic:
+                        ClassicLogin();
+                        break;
+                }
+            }
+            else
+            {
+                AccessToken = "None";
+                SelectedProfile = "None";
+            }
         }
 
         private void StartPlayerTickHandler()
@@ -98,6 +132,7 @@ namespace MineLib.ClientWrapper
         /// </summary>
         /// <param name="ip">The IP of the server to connect to</param>
         /// <param name="port">The port of the server to connect to</param>
+        /// <param name="serverHash">Classic server hash</param>
         public void Connect(string ip, short port)
         {
             ServerHost = ip;
@@ -111,18 +146,22 @@ namespace MineLib.ClientWrapper
             Entities = new Dictionary<int, Entity>();
             PlayersList = new Dictionary<string, short>();
 
-            Handler = new NetworkHandler(this);
-            //PlayerHandler = new PlayerHandler(ref Handler, ref Player);
+            Handler = new NetworkHandler(this, Mode);
 
             // -- Register our event handlers.
-            Handler.OnPacketHandled += RaisePacketHandled;
-            Handler.OnPacketHandledClassic += RaisePacketHandledClassic;
+            switch (Mode)
+            {
+                case NetworkMode.Main:
+                    Handler.OnPacketHandled += RaisePacketHandled;
+                    break;
+
+                case NetworkMode.Classic:
+                    Handler.OnPacketHandled += RaisePacketHandledClassic;
+                    break;
+            }
 
             // -- Connect to the server and begin reading packets.
             Handler.Start();
-
-            //PlayerHandlerThread = new Thread(HandlePlayer) { Name = "PlayerTickHandler"};
-            //PlayerHandlerThread.Start();
         }
 
         /// <summary>
@@ -150,7 +189,7 @@ namespace MineLib.ClientWrapper
                 Handler.Dispose();
 
             // -- Reset all variables to default so we can make a new connection.
-            State = ServerState.Login;
+            State = ServerState.MainLogin;
 
             World = null;
             Player = null;
@@ -162,6 +201,5 @@ namespace MineLib.ClientWrapper
         {
             Disconnect();
         }
-
     }
 }

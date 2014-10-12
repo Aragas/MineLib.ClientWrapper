@@ -1,20 +1,20 @@
 ﻿using System;
-using MineLib.Network.Enums;
-using MineLib.Network.Packets;
+using MineLib.Network;
+using MineLib.Network.Main.Enums;
 
 namespace MineLib.ClientWrapper
 {
     public partial class Minecraft
     {
-        private void RaisePacketHandled(IPacket packet, int id, ServerState? state)
+        private void RaisePacketHandled(int id, IPacket packet, ServerState? state)
         {
             // -- Debugging
-            Console.WriteLine("ID: 0x" + String.Format("{0:X}", id));
+            Console.WriteLine("Main ID: 0x" + String.Format("{0:X}", id));
             Console.WriteLine(" ");
 
             switch (state)
             {
-                case ServerState.Login:
+                case ServerState.MainLogin:
 
                     #region Login
 
@@ -28,7 +28,7 @@ namespace MineLib.ClientWrapper
                             break;
 
                         case PacketsServer.LoginSuccess:
-                            State = ServerState.Play;
+                            State = ServerState.MainPlay;
                             break;
                     }
 
@@ -36,7 +36,7 @@ namespace MineLib.ClientWrapper
 
                     break;
 
-                case ServerState.Play:
+                case ServerState.MainPlay:
 
                     #region Play
 
@@ -307,12 +307,12 @@ namespace MineLib.ClientWrapper
 
                     break;
 
-                case ServerState.Status: // -- We don't use that normally.
+                case ServerState.MainStatus: // -- We don't use that normally.
                     break;
 
                 default:
                     if (FirePacketHandled != null)
-                        FirePacketHandled(packet, id, state);
+                        FirePacketHandled(id, packet, state);
                     break;
             }
         }

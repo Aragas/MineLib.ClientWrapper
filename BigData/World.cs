@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using MineLib.Network.Data;
-using MineLib.Network.Data.Anvil;
-using MineLib.Network.Enums;
-using MineLib.Network.Packets;
+using MineLib.Network;
+using MineLib.Network.Main.Data;
+using MineLib.Network.Main.Data.Anvil;
+using MineLib.Network.Main.Enums;
 
 namespace MineLib.ClientWrapper.BigData
 {

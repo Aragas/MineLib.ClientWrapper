@@ -71,7 +71,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject />
+    <StartupObject>MineLib.ClientWrapper.TestClientClassic</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="BouncyCastle.Crypto, Version=1.7.4114.6375, Culture=neutral, PublicKeyToken=0e99375e54769942">
@@ -91,14 +91,17 @@
     <Compile Include="BigData\Player.cs" />
     <Compile Include="BigData\Vehicle.cs" />
     <Compile Include="BigData\World.cs" />
-    <Compile Include="Minecraft.Classic.cs" />
+    <Compile Include="Minecraft.Classic.Events.cs" />
+    <Compile Include="Minecraft.Classic.Packets.cs" />
+    <Compile Include="Minecraft.Classic.Login.cs" />
     <Compile Include="Minecraft.Client.cs" />
     <Compile Include="Minecraft.cs" />
-    <Compile Include="Minecraft.Events.cs" />
-    <Compile Include="Minecraft.Packets.cs" />
-    <Compile Include="Minecraft.Yggdrasil.cs" />
+    <Compile Include="Minecraft.Main.Events.cs" />
+    <Compile Include="Minecraft.Main.Packets.cs" />
+    <Compile Include="Minecraft.Main.Login.cs" />
     <Compile Include="PlayerHandler.cs" />
-    <Compile Include="TestClient.cs" />
+    <Compile Include="TestClient.Main.cs" />
+    <Compile Include="TestClient.Classic.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Network\MineLib.Network.csproj">

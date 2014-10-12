@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using MineLib.Network.Data;
-using MineLib.Network.Enums;
+using MineLib.Network.Main.Data;
+using MineLib.Network.Main.Enums;
 using Org.BouncyCastle.Math;
 
 namespace MineLib.ClientWrapper.BigData

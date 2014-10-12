@@ -1,6 +1,6 @@
 ﻿using System.Threading;
-using MineLib.Network.Enums;
-using MineLib.Network.Packets.Client;
+using MineLib.Network;
+using MineLib.Network.Main.Packets.Client;
 
 namespace MineLib.ClientWrapper
 {
@@ -22,7 +22,7 @@ namespace MineLib.ClientWrapper
 
         private void DoTick(object state)
         {
-            if (_minecraft.State == ServerState.Play)
+            if (_minecraft.State == ServerState.MainPlay)
                 //_minecraft.SendPacket(new PlayerPacket { OnGround = _minecraft.Player.Position.OnGround });
                 _minecraft.SendPacket(new PlayerPacket { OnGround = true });
 

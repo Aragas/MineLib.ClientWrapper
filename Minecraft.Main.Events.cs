@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using MineLib.ClientWrapper.BigData;
-using MineLib.Network.Data.Anvil;
+using MineLib.Network;
 using MineLib.Network.Events;
-using MineLib.Network.Packets;
-using MineLib.Network.Packets.Server;
+using MineLib.Network.Main.Data.Anvil;
+using MineLib.Network.Main.Packets.Server;
 
 namespace MineLib.ClientWrapper
 {
@@ -87,7 +87,6 @@ namespace MineLib.ClientWrapper
             Player.Health.Health = updateHealth.Health;
         }
 
-        private bool playerstarted = false;
         private void OnRespawn(IPacket packet) // -- Works
         {
             var respawn = (RespawnPacket) packet;
@@ -100,6 +99,7 @@ namespace MineLib.ClientWrapper
             World.Chunks.Clear(); // And unload all chunks.
         }
 
+        private bool playerstarted = false;
         private void OnPlayerPositionAndLook(IPacket packet) // -- Works
         {
             var playerPositionAndLook = (PlayerPositionAndLookPacket) packet;
@@ -110,7 +110,7 @@ namespace MineLib.ClientWrapper
             Player.Look.Pitch = playerPositionAndLook.Pitch;
             Player.Position.OnGround = true;
 
-            SendPacket(new Network.Packets.Client.PlayerPositionAndLookPacket
+            SendPacket(new Network.Main.Packets.Client.PlayerPositionAndLookPacket
             {
                 X = Player.Position.Vector3.X,
                 FeetY = Player.Position.Vector3.Y,
