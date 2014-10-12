@@ -1,8 +1,8 @@
 ﻿using System.Threading;
 using MineLib.Network;
-using MineLib.Network.Main.Packets.Client;
+using MineLib.Network.Modern.Packets.Client;
 
-namespace MineLib.ClientWrapper.Main
+namespace MineLib.ClientWrapper.Modern
 {
     // Not used
     public class PlayerTickHandler
@@ -22,7 +22,7 @@ namespace MineLib.ClientWrapper.Main
 
         private void DoTick(object state)
         {
-            if (_minecraft.State == ServerState.MainPlay)
+            if (_minecraft.State == ServerState.ModernPlay)
                 //_minecraft.SendPacket(new PlayerPacket { OnGround = _minecraft.Player.Position.OnGround });
                 _minecraft.SendPacket(new PlayerPacket { OnGround = true });
 

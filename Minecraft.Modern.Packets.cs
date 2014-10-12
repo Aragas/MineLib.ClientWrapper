@@ -1,6 +1,6 @@
 ﻿using System;
 using MineLib.Network;
-using MineLib.Network.Main.Enums;
+using MineLib.Network.Modern.Enums;
 
 namespace MineLib.ClientWrapper
 {
@@ -14,7 +14,7 @@ namespace MineLib.ClientWrapper
 
             switch (state)
             {
-                case ServerState.MainLogin:
+                case ServerState.ModernLogin:
 
                     #region Login
 
@@ -28,7 +28,7 @@ namespace MineLib.ClientWrapper
                             break;
 
                         case PacketsServer.LoginSuccess:
-                            State = ServerState.MainPlay;
+                            State = ServerState.ModernPlay;
                             break;
                     }
 
@@ -36,7 +36,7 @@ namespace MineLib.ClientWrapper
 
                     break;
 
-                case ServerState.MainPlay:
+                case ServerState.ModernPlay:
 
                     #region Play
 
@@ -307,7 +307,7 @@ namespace MineLib.ClientWrapper
 
                     break;
 
-                case ServerState.MainStatus: // -- We don't use that normally.
+                case ServerState.ModernStatus: // -- We don't use that normally.
                     break;
 
                 default:

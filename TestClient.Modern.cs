@@ -1,16 +1,16 @@
 ﻿using System.Text;
 using System.Threading;
 using MineLib.Network;
-using MineLib.Network.Main.BaseClients;
-using MineLib.Network.Main.Data;
-using MineLib.Network.Main.Enums;
-using MineLib.Network.Main.Packets;
-using MineLib.Network.Main.Packets.Client;
-using MineLib.Network.Main.Packets.Client.Login;
+using MineLib.Network.Modern.BaseClients;
+using MineLib.Network.Modern.Data;
+using MineLib.Network.Modern.Enums;
+using MineLib.Network.Modern.Packets;
+using MineLib.Network.Modern.Packets.Client;
+using MineLib.Network.Modern.Packets.Client.Login;
 
 namespace MineLib.ClientWrapper
 {
-    public static class TestClientMain
+    public static class TestClientModern
     {
         public static Minecraft Client;
         public static ResponseData ServerData;
@@ -25,7 +25,7 @@ namespace MineLib.ClientWrapper
                 ServerData = SClient.GetResponseData(ServerIP, ServerPort, 47);
 
 
-            Client = new Minecraft("TestBot", "", false, NetworkMode.Main);
+            Client = new Minecraft("TestBot", "", NetworkMode.Modern, false);
 
             /*
             Connect()
@@ -49,7 +49,7 @@ namespace MineLib.ClientWrapper
 
             Client.SendPacket(new LoginStartPacket { Name = "TestBot" });
 
-            while (Client.State != ServerState.MainPlay) { Thread.Sleep(250); }
+            while (Client.State != ServerState.ModernPlay) { Thread.Sleep(250); }
 
             Client.SendPacket(new ClientSettingsPacket
             {

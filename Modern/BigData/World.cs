@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using MineLib.Network;
-using MineLib.Network.Main.Data;
-using MineLib.Network.Main.Data.Anvil;
-using MineLib.Network.Main.Enums;
+using MineLib.Network.Modern.Data;
+using MineLib.Network.Modern.Data.Anvil;
+using MineLib.Network.Modern.Enums;
 
-namespace MineLib.ClientWrapper.Main.BigData
+namespace MineLib.ClientWrapper.Modern.BigData
 {
     // Just ignore it. I think something is wrong here :DD
     internal static class TimeSpanUtil

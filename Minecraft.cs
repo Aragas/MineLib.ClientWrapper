@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using MineLib.ClientWrapper.Main;
-using MineLib.ClientWrapper.Main.BigData;
+using MineLib.ClientWrapper.Modern;
+using MineLib.ClientWrapper.Modern.BigData;
 using MineLib.Network;
-using MineLib.Network.Main.Packets.Client;
+using MineLib.Network.Modern.Packets.Client;
 
 namespace MineLib.ClientWrapper
 {
@@ -69,11 +69,11 @@ namespace MineLib.ClientWrapper
 
         public NetworkHandler Handler;
 
-        public World MainWorld;
-        public Player MainPlayer;
-        public Dictionary<int, Entity> MainEntities;
-        public Dictionary<string, short> MainPlayersList;
-        public PlayerTickHandler MainPlayerHandler;
+        public World ModernWorld;
+        public Player ModernPlayer;
+        public Dictionary<int, Entity> ModernEntities;
+        public Dictionary<string, short> ModernPlayersList;
+        public PlayerTickHandler ModernPlayerHandler;
 
         /// <summary>
         /// Create a new Minecraft Instance
@@ -83,7 +83,7 @@ namespace MineLib.ClientWrapper
         /// <param name="nameVerification">To connect using Name Verification or not</param>
         /// <param name="classic">Classic mode</param>
         /// <param name="serverSalt"></param>
-        public Minecraft(string login, string password, bool nameVerification = false, NetworkMode mode = NetworkMode.Main, string serverSalt = null)
+        public Minecraft(string login, string password, NetworkMode mode, bool nameVerification = false, string serverSalt = null)
         {
             ClientLogin = login;
             ClientPassword = password;
@@ -93,8 +93,8 @@ namespace MineLib.ClientWrapper
 
             switch (Mode)
             {
-                case NetworkMode.Main:
-                    State = ServerState.MainLogin;
+                case NetworkMode.Modern:
+                    State = ServerState.ModernLogin;
                     break;
 
                 case NetworkMode.Classic:
@@ -106,8 +106,8 @@ namespace MineLib.ClientWrapper
             {
                 switch (Mode)
                 {
-                    case NetworkMode.Main:
-                        MainLogin();
+                    case NetworkMode.Modern:
+                        ModernLogin();
                         break;
 
                     case NetworkMode.Classic:
@@ -124,8 +124,8 @@ namespace MineLib.ClientWrapper
 
         private void StartPlayerTickHandler()
         {
-            MainPlayerHandler = new PlayerTickHandler(this);
-            MainPlayerHandler.Start();
+            ModernPlayerHandler = new PlayerTickHandler(this);
+            ModernPlayerHandler.Start();
         }
 
         /// <summary>
@@ -146,11 +146,11 @@ namespace MineLib.ClientWrapper
 
             switch (Mode)
             {
-                case NetworkMode.Main:
-                    MainWorld = new World();
-                    MainPlayer = new Player();
-                    MainEntities = new Dictionary<int, Entity>();
-                    MainPlayersList = new Dictionary<string, short>();
+                case NetworkMode.Modern:
+                    ModernWorld = new World();
+                    ModernPlayer = new Player();
+                    ModernEntities = new Dictionary<int, Entity>();
+                    ModernPlayersList = new Dictionary<string, short>();
 
                     // -- Register our event handlers.
                     Handler.OnPacketHandled += RaisePacketHandled;
@@ -191,12 +191,12 @@ namespace MineLib.ClientWrapper
                 Handler.Dispose();
 
             // -- Reset all variables to default so we can make a new connection.
-            State = ServerState.MainLogin;
+            State = ServerState.ModernLogin;
 
-            MainWorld = null;
-            MainPlayer = null;
-            MainPlayersList = null;
-            MainEntities = null;
+            ModernWorld = null;
+            ModernPlayer = null;
+            ModernPlayersList = null;
+            ModernEntities = null;
         }
 
         public void Dispose()

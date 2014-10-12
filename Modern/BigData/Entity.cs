@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using MineLib.Network.Main.Data;
-using MineLib.Network.Main.Enums;
+using MineLib.Network.Modern.Data;
+using MineLib.Network.Modern.Enums;
 using Org.BouncyCastle.Math;
 
-namespace MineLib.ClientWrapper.Main.BigData
+namespace MineLib.ClientWrapper.Modern.BigData
 {
     public class Entity
     {

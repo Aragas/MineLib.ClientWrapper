@@ -102,7 +102,7 @@ namespace MineLib.ClientWrapper
 
             SendPacket(new ExtEntryPacket
             {
-                ExtName = null,
+                ExtName = "",
                 Version = 0
             });
         }

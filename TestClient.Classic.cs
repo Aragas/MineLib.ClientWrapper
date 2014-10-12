@@ -13,7 +13,7 @@ namespace MineLib.ClientWrapper
             string ServerIP = "127.0.0.1";  //args[0];                 // localhost
             short ServerPort = 25565;       //short.Parse(args[1]);    // 25565
 
-            Client = new Minecraft("TestBot", "", false, NetworkMode.Classic);
+            Client = new Minecraft("TestBot", "", NetworkMode.Classic, false);
 
             /*
             Connect()

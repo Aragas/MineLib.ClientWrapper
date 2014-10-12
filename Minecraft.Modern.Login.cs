@@ -7,7 +7,7 @@ namespace MineLib.ClientWrapper
         /// <summary>
         ///     Login to Minecraft.net and store credentials
         /// </summary>
-        private void MainLogin()
+        private void ModernLogin()
         {
             var result = Yggdrasil.Login(ClientLogin, ClientPassword);
 
@@ -29,7 +29,7 @@ namespace MineLib.ClientWrapper
         /// <summary>
         ///     Uses a client's stored credentials to verify with Minecraft.net
         /// </summary>
-        public bool MainRefreshSession()
+        public bool ModernRefreshSession()
         {
             if (!VerifyNames)
                 return false;
@@ -48,7 +48,7 @@ namespace MineLib.ClientWrapper
             }
         }
 
-        public bool MainVerifySession()
+        public bool ModernVerifySession()
         {
             if (!VerifyNames)
                 return false;
@@ -56,7 +56,7 @@ namespace MineLib.ClientWrapper
             return Yggdrasil.VerifySession(AccessToken);
         }
 
-        public bool MainInvalidate()
+        public bool ModernInvalidate()
         {
             if (!VerifyNames)
                 return false;
@@ -64,7 +64,7 @@ namespace MineLib.ClientWrapper
             return Yggdrasil.Invalidate(AccessToken, ClientToken);
         }
 
-        public bool MainLogout()
+        public bool ModernLogout()
         {
             if (!VerifyNames)
                 return false;

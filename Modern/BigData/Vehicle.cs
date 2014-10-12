@@ -1,4 +1,4 @@
-﻿namespace MineLib.ClientWrapper.Main.BigData
+﻿namespace MineLib.ClientWrapper.Modern.BigData
 {
     public class Vehicle
     {
