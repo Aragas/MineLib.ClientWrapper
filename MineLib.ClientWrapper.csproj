@@ -11,21 +11,38 @@
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
+    <UseMSBuildEngine>False</UseMSBuildEngine>
+    <PublishUrl>опубликовать\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\x86\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>bin\x86\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -42,6 +59,8 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -51,6 +70,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
@@ -60,6 +80,8 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <OutputPath>bin\Release\</OutputPath>
@@ -69,48 +91,102 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>MineLib.ClientWrapper.TestClientClassic</StartupObject>
+    <StartupObject>MineLib.ClientWrapper.TestClient</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BouncyCastle.Crypto, Version=1.7.4114.6375, Culture=neutral, PublicKeyToken=0e99375e54769942">
+    <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Network\Libraries\BouncyCastle.Crypto.dll</HintPath>
+      <HintPath>Libraries\OpenTK.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="OpenTK.GLControl, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Network\Libraries\Newtonsoft.Json.dll</HintPath>
+      <HintPath>Libraries\OpenTK.GLControl.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>Network\Libraries\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>Network\Libraries\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Modern\BigData\Entity.cs" />
-    <Compile Include="Modern\BigData\Object.cs" />
-    <Compile Include="Modern\BigData\Player.cs" />
-    <Compile Include="Modern\BigData\Vehicle.cs" />
-    <Compile Include="Modern\BigData\World.cs" />
-    <Compile Include="Minecraft.Classic.Events.cs" />
-    <Compile Include="Minecraft.Classic.Packets.cs" />
-    <Compile Include="Minecraft.Classic.Login.cs" />
+    <Compile Include="Graphic\Camera.cs" />
+    <Compile Include="Data\Entity.cs" />
+    <Compile Include="Data\Object.cs" />
+    <Compile Include="Data\BigData\Player.cs" />
+    <Compile Include="Data\Vehicle.cs" />
+    <Compile Include="Data\BigData\World.cs" />
+    <Compile Include="Graphic\Vector3Converter.cs" />
+    <Compile Include="Minecraft.AsyncSending.cs" />
     <Compile Include="Minecraft.Client.cs" />
     <Compile Include="Minecraft.cs" />
-    <Compile Include="Minecraft.Modern.Events.cs" />
-    <Compile Include="Minecraft.Modern.Packets.cs" />
-    <Compile Include="Minecraft.Modern.Login.cs" />
-    <Compile Include="Modern\PlayerHandler.cs" />
-    <Compile Include="TestClient.Modern.cs" />
-    <Compile Include="TestClient.Classic.cs" />
+    <Compile Include="PlayerHandler.cs" />
+    <Compile Include="Graphic\MinecraftGame.cs" />
+    <Compile Include="TestClient.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Network\MineLib.Network.csproj">
-      <Project>{e7c8320e-49a4-4187-afe3-15c814201e1e}</Project>
+      <Project>{E7C8320E-49A4-4187-AFE3-15C814201E1E}</Project>
       <Name>MineLib.Network</Name>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </ProjectReference>
+    <ProjectReference Include="Network\ProtocolClassic\ProtocolClassic.csproj">
+      <Project>{bdaddf68-34a0-41c9-8728-8de743cc4383}</Project>
+      <Name>ProtocolClassic</Name>
+    </ProjectReference>
+    <ProjectReference Include="Network\ProtocolCLIWrapper\ProtocolCLIWrapper.vcxproj">
+      <Project>{0fae4fdd-64e4-4084-aa32-2a00f9055746}</Project>
+      <Name>ProtocolCLIWrapper</Name>
+    </ProjectReference>
+    <ProjectReference Include="Network\ProtocolMinetest\ProtocolMinetest.csproj">
+      <Project>{69e3a62e-98e9-48d5-9bf0-836fff8bac9f}</Project>
+      <Name>ProtocolMinetest</Name>
+    </ProjectReference>
+    <ProjectReference Include="Network\ProtocolModern\ProtocolModern.csproj">
+      <Project>{1360e652-2f92-4245-b3ad-0ec4d73e2945}</Project>
+      <Name>ProtocolModern</Name>
+    </ProjectReference>
+    <ProjectReference Include="Network\ProtocolPocketEdition\ProtocolPocketEdition.csproj">
+      <Project>{3df15cbb-d75e-4cb1-8590-222062e9587f}</Project>
+      <Name>ProtocolPocketEdition</Name>
+    </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 и x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>Клиентский профиль .NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.4.5">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 4.5</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Libraries\Newtonsoft.Json.dll" />
+    <Content Include="Libraries\OpenTK.dll" />
+    <Content Include="Libraries\OpenTK.GLControl.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Minecraft.AsyncReceiving.cs" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />

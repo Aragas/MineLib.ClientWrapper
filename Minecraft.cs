@@ -1,53 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
-using MineLib.ClientWrapper.Modern;
-using MineLib.ClientWrapper.Modern.BigData;
+using MineLib.ClientWrapper.Data;
+using MineLib.ClientWrapper.Data.BigData;
 using MineLib.Network;
-using MineLib.Network.Modern.Packets.Client;
 
 namespace MineLib.ClientWrapper
 {
     /// <summary>
     /// Wrapper for Network of MineLib.Net.
     /// </summary>
-    public partial class Minecraft : IMinecraftClient, IDisposable
+    public partial class Minecraft : IMinecraftClient
     {
-        // -- Debugging
-        public List<IPacket> LastPackets
-        {
-            get
-            {
-                try { return Handler.PacketsReceived.GetRange(Handler.PacketsReceived.Count - 50, 50); }
-                catch { return null; }
-            }
-        }
-        public IPacket LastPacket { get { return Handler.PacketsReceived[Handler.PacketsReceived.Count - 1]; } }
-        // -- Debugging
-
         #region Variables
 
         public string AccessToken { get; set; }
 
         public string ClientLogin { get; set; }
-
         private string _clientUsername;
-        public string ClientUsername { get { return _clientUsername ?? ClientLogin; } }
+
+        public string ClientUsername
+        {
+            get { return _clientUsername ?? ClientLogin; } 
+            set { _clientUsername = value; }
+        }
+        public string ClientPassword { get; set; }
+        public bool UseLogin { get; private set; }
 
         public string ClientToken { get; set; }
 
         public string SelectedProfile { get; set; }
 
-        public string ClientPassword { get; set; }
-
-        public string ClientBrand { get { return "MineLib.Network";} }
+        public string PlayerName { get; set; }
+        public string ClientBrand
+        {
+            get { return "MineLib.Network";}
+            set { throw new System.NotImplementedException(); }
+        }
 
         public string ServerBrand { get; set; }
 
-        public bool VerifyNames { get; set; }
-
         public string ServerHost { get; set; }
 
-        public short ServerPort { get; set; }
+        public ushort ServerPort { get; set; }
 
         public string ServerSalt { get; set; }
 
@@ -55,153 +49,118 @@ namespace MineLib.ClientWrapper
 
         public string ServerMOTD { get; set; }
 
-        public ServerState State { get; set; }
-
-        public NetworkMode Mode { get; set; }
+        public NetworkMode Mode { get; private set; }
+        public ConnectionState ConnectionState { get { return _networkHandler.ConnectionState; } }
 
         #endregion Variables
 
-        public bool Connected { get { return Handler.Connected; }}
-
-        public bool Crashed { get { return Handler.Crashed; } }
+        public bool Connected { get { return _networkHandler.Connected; }}
 
         public bool ReducedDebugInfo;
 
-        public NetworkHandler Handler;
+        public World World;
+        public Player Player;
+        public Dictionary<int, Entity> Entities;
+        public Dictionary<string, short> PlayersList;
+        public PlayerTickHandler PlayerHandler;
 
-        public World ModernWorld;
-        public Player ModernPlayer;
-        public Dictionary<int, Entity> ModernEntities;
-        public Dictionary<string, short> ModernPlayersList;
-        public PlayerTickHandler ModernPlayerHandler;
+        private INetworkHandler _networkHandler;
 
         /// <summary>
         /// Create a new Minecraft Instance
         /// </summary>
         /// <param name="login">The username to use when connecting to Minecraft</param>
         /// <param name="password">The password to use when connecting to Minecraft (Ignore if you are providing credentials)</param>
+        /// <param name="mode"></param>
         /// <param name="nameVerification">To connect using Name Verification or not</param>
-        /// <param name="classic">Classic mode</param>
         /// <param name="serverSalt"></param>
-        public Minecraft(string login, string password, NetworkMode mode, bool nameVerification = false, string serverSalt = null)
+        public IMinecraftClient Create(string login, string password, NetworkMode mode, bool nameVerification = false, string serverSalt = null)
         {
             ClientLogin = login;
             ClientPassword = password;
-            VerifyNames = nameVerification;
+            UseLogin = nameVerification;
             Mode = mode;
             ServerSalt = serverSalt;
 
-            switch (Mode)
-            {
-                case NetworkMode.Modern:
-                    State = ServerState.ModernLogin;
-                    break;
+            AsyncReceiveHandlers = new Dictionary<Type, Action<IAsyncReceive>>();
+            RegisterSupportedReceiveEvents();
 
-                case NetworkMode.Classic:
-                    State = ServerState.ClassicLogin;
-                    break;
-            }
+            World = new World();
+            Player = new Player();
+            Entities = new Dictionary<int, Entity>();
+            PlayersList = new Dictionary<string, short>();
 
-            if (VerifyNames)
-            {
-                switch (Mode)
-                {
-                    case NetworkMode.Modern:
-                        ModernLogin();
-                        break;
+            _networkHandler = new NetworkHandler();
+            _networkHandler.Create(this);
 
-                    case NetworkMode.Classic:
-                        ClassicLogin();
-                        break;
-                }
-            }
-            else
-            {
-                AccessToken = "None";
-                SelectedProfile = "None";
-            }
+            return this;
         }
 
         private void StartPlayerTickHandler()
         {
-            ModernPlayerHandler = new PlayerTickHandler(this);
-            ModernPlayerHandler.Start();
+            PlayerHandler = new PlayerTickHandler(this);
+            PlayerHandler.Start();
         }
+
+        /// <summary>
+        /// Connects to the Minecraft Server. If connected, don't call EndConnect.
+        /// </summary>
+        /// <param name="ip">The IP of the server to connect to</param>
+        /// <param name="port">The port of the server to connect to</param>
+        public IAsyncResult BeginConnect(string ip, ushort port, AsyncCallback asyncCallback, object state)
+        {
+            ServerHost = ip;
+            ServerPort = port;
+
+            // -- Connect to the server and begin reading packets.
+            return _networkHandler.BeginConnect(ip, port, asyncCallback, state);
+        }
+
+        private void EndConnect(IAsyncResult asyncResult)
+        {
+            //_networkHandler.EndConnect(asyncResult);
+        }
+
+        public IAsyncResult BeginDisconnect(AsyncCallback asyncCallback, object state)
+        {
+            return _networkHandler.BeginDisconnect(asyncCallback, state);
+        }
+
+        public void EndDisconnect(IAsyncResult asyncResult)
+        {
+            _networkHandler.EndDisconnect(asyncResult);
+        }
+
 
         /// <summary>
         /// Connects to the Minecraft Server.
         /// </summary>
         /// <param name="ip">The IP of the server to connect to</param>
         /// <param name="port">The port of the server to connect to</param>
-        /// <param name="serverHash">Classic server hash</param>
-        public void Connect(string ip, short port)
+        public void Connect(string ip, ushort port)
         {
             ServerHost = ip;
             ServerPort = port;
 
-            if (Handler != null)
-                Disconnect();
-
-            Handler = new NetworkHandler(this, Mode);
-
-            switch (Mode)
-            {
-                case NetworkMode.Modern:
-                    ModernWorld = new World();
-                    ModernPlayer = new Player();
-                    ModernEntities = new Dictionary<int, Entity>();
-                    ModernPlayersList = new Dictionary<string, short>();
-
-                    // -- Register our event handlers.
-                    Handler.OnPacketHandled += RaisePacketHandled;
-                    break;
-
-                case NetworkMode.Classic:
-                    // -- Register our event handlers.
-                    Handler.OnPacketHandled += RaisePacketHandledClassic;
-                    break;
-            }
-
             // -- Connect to the server and begin reading packets.
-            Handler.Start();
+            _networkHandler.Connect(ip, port);
         }
 
-        /// <summary>
-        /// Send IPacket to the Minecraft Server.
-        /// </summary>
-        /// <param name="packet">IPacket to sent to server</param>
-        public void SendPacket(IPacket packet)
-        {
-            if (Handler != null && Connected)
-                Handler.Send(packet);
-        }
-
-        public void SendChatMessage(string message)
-        {
-            if (Handler != null && Connected)
-                Handler.Send(new ChatMessagePacket {Message = message});
-        }
-
-        /// <summary>
+         /// <summary>
         /// Disconnects from the Minecraft server.
         /// </summary>
         public void Disconnect()
         {
-            if (Handler != null)
-                Handler.Dispose();
+            _networkHandler.Disconnect();
 
-            // -- Reset all variables to default so we can make a new connection.
-            State = ServerState.ModernLogin;
-
-            ModernWorld = null;
-            ModernPlayer = null;
-            ModernPlayersList = null;
-            ModernEntities = null;
+            Dispose();
         }
+
 
         public void Dispose()
         {
-            Disconnect();
+            if (_networkHandler != null)
+                _networkHandler.Dispose();
         }
     }
 }

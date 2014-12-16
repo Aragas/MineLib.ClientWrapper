@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using MineLib.Network.Modern.Data;
-using MineLib.Network.Modern.Enums;
+using MineLib.Network.Data;
 using Newtonsoft.Json;
 
-// Use http://json2csharp.com/
+// -- Use http://json2csharp.com/
 namespace MineLib.ClientWrapper
 {
     public partial class Minecraft
@@ -11,6 +10,8 @@ namespace MineLib.ClientWrapper
         // -- Debugging
         public readonly List<ChatMessage> ChatTextHistory = new List<ChatMessage>();
         // -- Debugging
+
+        public List<string> ChatHistory = new List<string>(); 
 
         public struct Extra
         {
@@ -81,15 +82,9 @@ namespace MineLib.ClientWrapper
         }
 
 
-        private void PlaySound(string soundName, Position coordinates,
-            float volume, byte pitch)
-        {
-        }
+        private void PlaySound(string soundName, Position coordinates, float volume, byte pitch) { }
 
-        private void PlayEffect(EffectID effectId, Position coordinates,
-            int data, bool disableRelativeVolume)
-        {
-        }
+        private void PlayEffect(int effectId, Position coordinates, int data, bool disableRelativeVolume) { }
 
         private void DisplayChatMessage(string message)
         {
@@ -98,8 +93,6 @@ namespace MineLib.ClientWrapper
             ChatTextHistory.Add(Text);
         }
 
-        private void EditSign(Position coordinates)
-        {
-        }
+        private void EditSign(Position coordinates) { }
     }
 }
