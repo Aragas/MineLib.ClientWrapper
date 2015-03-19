@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Net.Mime;
 using System.Runtime.InteropServices;
 using System.Threading;
-using MineLib.ClientWrapper.Graphic;
 using MineLib.Network;
-using MineLib.Network.Data;
 using MineLib.Network.Data.Anvil;
-using MineLib.Network.Data.Structs;
 
 namespace MineLib.ClientWrapper
 {
@@ -18,15 +13,18 @@ namespace MineLib.ClientWrapper
 
         public static void Main(string[] args)
         {
-            string ServerIP = "127.0.0.1";  //args[0];                 // localhost
-            ushort ServerPort = 25565;      //short.Parse(args[1]);    // 25565
+            const string serverIp = "127.0.0.1"; //args[0];                 // localhost
+            const ushort serverPort = 25565; //short.Parse(args[1]);    // 25565
 
             // Gettin' information about the server.
             //using (var SClient = new ServerInfoParser())
             //    ServerData = SClient.GetResponseData(ServerIP, ServerPort, 47);
 
-            Client = new Minecraft().Create("TestBot", "", NetworkMode.ProtocolModern, true) as Minecraft;
-            Client.BeginConnect(ServerIP, ServerPort, OnConnected, null);
+            Client = new Minecraft().Initialize("TestBot", "", NetworkMode.Module, true) as Minecraft;
+            Client?.BeginConnect(serverIp, serverPort, OnConnected, null);
+
+            //Block b = new Block(0);
+            //int t = Marshal.SizeOf(typeof(Block));
 
             while (true) { Thread.Sleep(50); }
         }

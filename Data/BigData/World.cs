@@ -58,16 +58,10 @@ namespace MineLib.ClientWrapper.Data.BigData
             //return 12; // this disables the day & night cycle.
         }
 
-        public TimeSpan AgeOfTheWorldTimeSpan
-        {
-            get
-            {
-                return new TimeSpan(
-                    (int) TimeSpanUtil.ConvertSecondsToDays(AgeOfTheWorld / 20),
-                    (int) TimeSpanUtil.ConvertSecondsToHours(AgeOfTheWorld / 20),
-                    (int) TimeSpanUtil.ConvertSecondsToMinutes(AgeOfTheWorld / 20));
-            }
-        }
+        public TimeSpan AgeOfTheWorldTimeSpan => new TimeSpan(
+            (int) TimeSpanUtil.ConvertSecondsToDays(AgeOfTheWorld / 20),
+            (int) TimeSpanUtil.ConvertSecondsToHours(AgeOfTheWorld / 20),
+            (int) TimeSpanUtil.ConvertSecondsToMinutes(AgeOfTheWorld / 20));
 
         public World()
         {

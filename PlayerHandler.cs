@@ -7,7 +7,8 @@ namespace MineLib.ClientWrapper.Data
     // Not used
     public class PlayerTickHandler
     {
-        private Minecraft _minecraft;
+        private readonly Minecraft _minecraft;
+
         private Timer _timer;
 
         public PlayerTickHandler(Minecraft minecraft)

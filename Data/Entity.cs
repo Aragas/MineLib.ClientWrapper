@@ -55,10 +55,7 @@ namespace MineLib.ClientWrapper.Data.BigData
             Effects = new List<EntityEffect>();
         }
 
-        public bool IsPlayer
-        {
-            get { return Player.UUID != null && Player.UUID != null; }
-        }
+        public bool IsPlayer => Player.UUID != null && Player.UUID != null;
     }
 
     public struct EntityEquipment

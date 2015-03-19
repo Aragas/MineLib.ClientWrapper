@@ -65,10 +65,10 @@ namespace MineLib.ClientWrapper.Data.BigData
     public struct PlayerAbilities
     {
         public sbyte Flags;
-        public bool DamageDisabled { get { return Convert.ToBoolean((Flags >> 3) & 1); } }
-        public bool CanFly { get { return Convert.ToBoolean((Flags >> 2) & 1); } }
-        public bool IsFlying { get { return Convert.ToBoolean((Flags >> 1) & 1); } }
-        public bool CreativeMode { get { return Convert.ToBoolean((Flags >> 0) & 1); } }
+        public bool DamageDisabled => Convert.ToBoolean((Flags >> 3) & 1);
+        public bool CanFly => Convert.ToBoolean((Flags >> 2) & 1);
+        public bool IsFlying => Convert.ToBoolean((Flags >> 1) & 1);
+        public bool CreativeMode => Convert.ToBoolean((Flags >> 0) & 1);
         public float FlyingSpeed;
         public float WalkingSpeed;
     }

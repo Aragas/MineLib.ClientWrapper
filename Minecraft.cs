@@ -11,7 +11,7 @@ namespace MineLib.ClientWrapper
     /// </summary>
     public partial class Minecraft : IMinecraftClient
     {
-        #region Variables
+        #region Properties
 
         public string AccessToken { get; set; }
 
@@ -34,7 +34,7 @@ namespace MineLib.ClientWrapper
         public string ClientBrand
         {
             get { return "MineLib.Network";}
-            set { throw new System.NotImplementedException(); }
+            set { throw new NotImplementedException(); }
         }
 
         public string ServerBrand { get; set; }
@@ -50,11 +50,11 @@ namespace MineLib.ClientWrapper
         public string ServerMOTD { get; set; }
 
         public NetworkMode Mode { get; private set; }
-        public ConnectionState ConnectionState { get { return _networkHandler.ConnectionState; } }
+        public ConnectionState ConnectionState => _networkHandler.ConnectionState;
 
-        #endregion Variables
+        public bool Connected => _networkHandler.Connected;
 
-        public bool Connected { get { return _networkHandler.Connected; }}
+        #endregion Properties
 
         public bool ReducedDebugInfo;
 
@@ -74,7 +74,7 @@ namespace MineLib.ClientWrapper
         /// <param name="mode"></param>
         /// <param name="nameVerification">To connect using Name Verification or not</param>
         /// <param name="serverSalt"></param>
-        public IMinecraftClient Create(string login, string password, NetworkMode mode, bool nameVerification = false, string serverSalt = null)
+        public IMinecraftClient Initialize(string login, string password, NetworkMode mode, bool nameVerification = false, string serverSalt = null)
         {
             ClientLogin = login;
             ClientPassword = password;
@@ -91,7 +91,8 @@ namespace MineLib.ClientWrapper
             PlayersList = new Dictionary<string, short>();
 
             _networkHandler = new NetworkHandler();
-            _networkHandler.Create(this);
+            var modules = _networkHandler.GetModules();
+            _networkHandler.Initialize(modules[1], this, true);
 
             return this;
         }
@@ -152,15 +153,12 @@ namespace MineLib.ClientWrapper
         public void Disconnect()
         {
             _networkHandler.Disconnect();
-
-            Dispose();
         }
 
 
         public void Dispose()
         {
-            if (_networkHandler != null)
-                _networkHandler.Dispose();
+            _networkHandler?.Dispose();
         }
     }
 }
