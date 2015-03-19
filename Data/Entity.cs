@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using MineLib.Network.Data;
 using MineLib.Network.Data.Structs;
 using Org.BouncyCastle.Math;
 
-namespace MineLib.ClientWrapper.Data.BigData
+namespace MineLib.ClientWrapper.Data
 {
     public class Entity
     {

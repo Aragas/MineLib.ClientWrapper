@@ -1,4 +1,4 @@
-﻿namespace MineLib.ClientWrapper.Data.BigData
+﻿namespace MineLib.ClientWrapper.Data
 {
     public class Object
     {
